@@ -1,6 +1,6 @@
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { LightboxImage } from "@/components/shared/lightbox-image";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DEFAULT_DECISION_THRESHOLDS, DEFAULT_SETTINGS } from "@/lib/constants";
@@ -35,15 +35,13 @@ function GuideStep({ step, title, children, images }: GuideStepProps) {
         <div className="space-y-4 pl-10">
           <div className="space-y-2 text-sm text-muted-foreground">{children}</div>
           {images.map((image) => (
-            <div key={image.src} className="overflow-hidden rounded-lg border">
-              <Image
-                src={image.src}
-                width={image.width}
-                height={image.height}
-                alt={image.alt}
-                className="h-auto w-full"
-              />
-            </div>
+            <LightboxImage
+              key={image.src}
+              src={image.src}
+              width={image.width}
+              height={image.height}
+              alt={image.alt}
+            />
           ))}
         </div>
       </AccordionContent>
