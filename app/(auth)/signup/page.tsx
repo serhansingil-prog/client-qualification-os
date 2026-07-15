@@ -2,8 +2,8 @@ import Link from "next/link";
 import { signup } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MaskableInput } from "@/components/shared/maskable-input";
 
 export default async function SignupPage({
   searchParams,
@@ -23,14 +23,14 @@ export default async function SignupPage({
         <form action={signup} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">E-posta</Label>
-            <Input id="email" name="email" type="email" autoComplete="email" required />
+            <MaskableInput id="email" name="email" type="email" autoComplete="off" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Şifre</Label>
-            <Input
+            <MaskableInput
               id="password"
               name="password"
-              type="password"
+              type="text"
               autoComplete="new-password"
               minLength={6}
               required

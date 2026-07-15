@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { UserApprovalsTable } from "@/components/admin/user-approvals-table";
+import { MaskedEmail } from "@/components/shared/masked-email";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
@@ -107,7 +108,9 @@ export default async function AdminPage({
               <TableBody>
                 {(recentActions ?? []).map((entry) => (
                   <TableRow key={entry.id}>
-                    <TableCell>{entry.actor_email}</TableCell>
+                    <TableCell>
+                      <MaskedEmail email={entry.actor_email} />
+                    </TableCell>
                     <TableCell>{ACTION_LABELS[entry.action] ?? entry.action}</TableCell>
                     <TableCell>{entry.target_email}</TableCell>
                     <TableCell>{formatDateTime(entry.created_at)}</TableCell>
