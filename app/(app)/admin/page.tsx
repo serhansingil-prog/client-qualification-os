@@ -1,8 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { approveUser, rejectUser } from "@/app/(app)/admin/actions";
-import { Badge } from "@/components/ui/badge";
+import { UserApprovalsTable } from "@/components/admin/user-approvals-table";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
@@ -12,23 +12,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate } from "@/lib/dates";
+import { formatDateTime } from "@/lib/dates";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: "Onay Bekliyor",
-  approved: "Onaylı",
-  rejected: "Reddedildi",
-};
-
-const STATUS_VARIANTS: Record<string, "outline" | "default" | "destructive"> = {
-  pending: "outline",
-  approved: "default",
-  rejected: "destructive",
+const ACTION_LABELS: Record<string, string> = {
+  approve: "Onayladı",
+  reject: "Reddetti",
+  archive: "Arşivledi",
 };
 
 const PAGE_SIZE = 10;
+const RECENT_ACTIONS_LIMIT = 20;
 
 export default async function AdminPage({
   searchParams,
@@ -50,66 +45,79 @@ export default async function AdminPage({
   const to = from + PAGE_SIZE - 1;
 
   const admin = createAdminClient();
-  const { data: profiles, count } = await admin
-    .from("profiles")
-    .select("id, email, status, created_at", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(from, to);
+  const [{ data: profiles, count }, { data: recentActions }] = await Promise.all([
+    admin
+      .from("profiles")
+      .select("id, email, status, created_at", { count: "exact" })
+      .eq("archived", false)
+      .order("created_at", { ascending: false })
+      .range(from, to),
+    admin
+      .from("admin_audit_log")
+      .select("id, actor_email, action, target_email, created_at")
+      .order("created_at", { ascending: false })
+      .limit(RECENT_ACTIONS_LIMIT),
+  ]);
 
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Kullanıcı Onayları</CardTitle>
-        <CardDescription>
-          Yeni kayıt olan kullanıcılar burada onaylanana kadar uygulamayı kullanamaz.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>E-posta</TableHead>
-              <TableHead>Kayıt Tarihi</TableHead>
-              <TableHead>Durum</TableHead>
-              <TableHead className="text-right">İşlem</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(profiles ?? []).map((profile) => (
-              <TableRow key={profile.id}>
-                <TableCell>{profile.email}</TableCell>
-                <TableCell>{formatDate(profile.created_at)}</TableCell>
-                <TableCell>
-                  <Badge variant={STATUS_VARIANTS[profile.status]}>
-                    {STATUS_LABELS[profile.status]}
-                  </Badge>
-                </TableCell>
-                <TableCell className="flex justify-end gap-2">
-                  {profile.status !== "approved" ? (
-                    <form action={approveUser.bind(null, profile.id)}>
-                      <Button type="submit" size="sm">
-                        Onayla
-                      </Button>
-                    </form>
-                  ) : null}
-                  {profile.status !== "rejected" ? (
-                    <form action={rejectUser.bind(null, profile.id)}>
-                      <Button type="submit" size="sm" variant="outline">
-                        Reddet
-                      </Button>
-                    </form>
-                  ) : null}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-      <CardFooter>
-        <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin" />
-      </CardFooter>
-    </Card>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Kullanıcı Onayları</CardTitle>
+          <CardDescription>
+            Yeni kayıt olan kullanıcılar burada onaylanana kadar uygulamayı kullanamaz.
+          </CardDescription>
+          <CardAction>
+            <Button
+              nativeButton={false}
+              variant="outline"
+              size="sm"
+              render={<Link href="/admin/changelog">Değişiklik Günlüğü</Link>}
+            />
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <UserApprovalsTable profiles={profiles ?? []} />
+        </CardContent>
+        <CardFooter>
+          <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin" />
+        </CardFooter>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Son İşlemler</CardTitle>
+          <CardDescription>Admin tarafından yapılan son {RECENT_ACTIONS_LIMIT} işlem.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {(recentActions ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">Henüz bir işlem yapılmadı.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Admin</TableHead>
+                  <TableHead>İşlem</TableHead>
+                  <TableHead>Kullanıcı</TableHead>
+                  <TableHead>Tarih</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(recentActions ?? []).map((entry) => (
+                  <TableRow key={entry.id}>
+                    <TableCell>{entry.actor_email}</TableCell>
+                    <TableCell>{ACTION_LABELS[entry.action] ?? entry.action}</TableCell>
+                    <TableCell>{entry.target_email}</TableCell>
+                    <TableCell>{formatDateTime(entry.created_at)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

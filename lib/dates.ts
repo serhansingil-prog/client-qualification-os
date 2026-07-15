@@ -34,6 +34,19 @@ export function formatDate(isoDate?: string): string {
   }).format(date);
 }
 
+export function formatDateTime(isoDate?: string): string {
+  if (!isoDate) return "-";
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return "-";
+  return new Intl.DateTimeFormat("tr-TR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
 export function formatDateShort(isoDate?: string): string {
   if (!isoDate) return "-";
   const date = new Date(isoDate);
