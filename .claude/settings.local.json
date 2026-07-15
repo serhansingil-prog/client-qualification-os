@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"d:\\\\Claude\\\\client-qualification-os\" && mv client-qualification-os.md ../client-qualification-os.md.bak && ls -la)"
+    ],
+    "additionalDirectories": [
+      "d:\\Claude"
+    ]
+  }
+}
