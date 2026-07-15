@@ -9,11 +9,11 @@ export default function AppLayout({
 }>) {
   return (
     <>
-      <div className="flex min-h-full">
+      <div className="flex h-screen overflow-hidden">
         <AppSidebar />
-        <div className="flex min-h-full flex-1 flex-col">
+        <div className="flex h-screen flex-1 flex-col overflow-hidden">
           <AppHeader />
-          <main className="flex-1 px-4 pb-20 pt-6 md:px-8 md:pb-8">{children}</main>
+          <main className="flex-1 overflow-y-auto px-4 pb-20 pt-6 md:px-8 md:pb-8">{children}</main>
         </div>
       </div>
       <MobileBottomNav />

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import { CHANGELOG_ENTRIES } from "@/lib/changelog";
-import { formatDate } from "@/lib/dates";
+import { formatDateTime } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 
 const PAGE_SIZE = 5;
@@ -47,7 +47,7 @@ export default async function ChangelogPage({
               <Badge variant={entry.type === "major" ? "default" : "outline"}>
                 {entry.type === "major" ? "Major" : "Minor"}
               </Badge>
-              <span className="text-xs text-muted-foreground">{formatDate(entry.date)}</span>
+              <span className="text-xs text-muted-foreground">{formatDateTime(entry.date)}</span>
             </div>
             <p className="mt-2 text-sm font-medium">{entry.title}</p>
             <p className="mt-1 text-sm text-muted-foreground">{entry.description}</p>

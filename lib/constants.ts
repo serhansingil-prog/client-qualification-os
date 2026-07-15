@@ -6,6 +6,7 @@ export const SETTINGS_STORAGE_KEY = "cqos_settings";
 export const EVALUATIONS_STORAGE_KEY = "cqos_evaluations";
 export const DEMO_EVALUATIONS_STORAGE_KEY = "cqos_demo_evaluations";
 export const DEMO_MODE_STORAGE_KEY = "cqos_demo_mode";
+export const SIDEBAR_OPEN_STORAGE_KEY = "cqos_sidebar_open";
 
 export const DEFAULT_TECH_STACK = [
   "n8n",

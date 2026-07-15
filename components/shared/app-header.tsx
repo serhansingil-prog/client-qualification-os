@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Menu, Moon, ShieldCheck, Sun } from "lucide-react";
+import { Menu, Moon, PanelLeftClose, PanelLeftOpen, ShieldCheck, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { getActiveNavHref, NAV_ITEMS } from "@/lib/nav";
 import { AdminNavLink } from "@/components/shared/admin-nav-link";
 import { DemoModeToggle } from "@/components/shared/demo-mode-toggle";
 import { UserMenu } from "@/components/shared/user-menu";
+import { useSidebarOpen } from "@/hooks/use-sidebar-open";
 
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -47,14 +48,29 @@ export function AppHeader() {
   const pathname = usePathname();
   const activeHref = getActiveNavHref(pathname);
   const [open, setOpen] = useState(false);
+  const { isOpen: sidebarOpen, toggle: toggleSidebar } = useSidebarOpen();
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60 md:px-6">
+    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60 md:px-6">
       <div className="flex items-center gap-2 md:hidden">
         <ShieldCheck className="h-5 w-5 text-primary" aria-hidden="true" />
         <span className="font-semibold tracking-tight">CQ OS</span>
       </div>
-      <div className="hidden md:block" />
+      <div className="hidden items-center gap-3 md:flex">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          aria-label={sidebarOpen ? "Kenar çubuğunu gizle" : "Kenar çubuğunu göster"}
+        >
+          {sidebarOpen ? (
+            <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
+          ) : (
+            <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
+          )}
+        </Button>
+        <span className="text-sm text-muted-foreground italic">Her fırsat bir evet değildir.</span>
+      </div>
       <div className="flex items-center gap-2">
         <ThemeToggle />
         <Sheet open={open} onOpenChange={setOpen}>
