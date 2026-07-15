@@ -38,13 +38,17 @@ export function EvaluationActions({
   const [importMode, setImportMode] = useState<"merge" | "overwrite">("merge");
   const [confirmBulkDeleteOpen, setConfirmBulkDeleteOpen] = useState(false);
 
-  function handleExportJson() {
-    const data = exportData();
-    downloadFile(
-      `client-qualification-os-export-${new Date().toISOString().slice(0, 10)}.json`,
-      JSON.stringify(data, null, 2),
-      "application/json"
-    );
+  async function handleExportJson() {
+    try {
+      const data = await exportData();
+      downloadFile(
+        `client-qualification-os-export-${new Date().toISOString().slice(0, 10)}.json`,
+        JSON.stringify(data, null, 2),
+        "application/json"
+      );
+    } catch {
+      toast.error("Dışa aktarma başarısız oldu.");
+    }
   }
 
   function handleExportCsv() {
@@ -62,18 +66,22 @@ export function EvaluationActions({
     if (!file) return;
 
     const text = await file.text();
-    const result = importData(text, importMode);
-    if (!result.success) {
-      toast.error(`İçe aktarma başarısız: ${result.errors[0] ?? "Bilinmeyen hata"}`);
-      return;
+    try {
+      const result = await importData(text, importMode);
+      if (!result.success) {
+        toast.error(`İçe aktarma başarısız: ${result.errors[0] ?? "Bilinmeyen hata"}`);
+        return;
+      }
+      toast.success(
+        `${result.importedCount} değerlendirme içe aktarıldı${
+          result.duplicateCount > 0 ? `, ${result.duplicateCount} kopya atlandı` : ""
+        }.`
+      );
+      setImportOpen(false);
+      onImported();
+    } catch {
+      toast.error("İçe aktarma sırasında bir hata oluştu.");
     }
-    toast.success(
-      `${result.importedCount} değerlendirme içe aktarıldı${
-        result.duplicateCount > 0 ? `, ${result.duplicateCount} kopya atlandı` : ""
-      }.`
-    );
-    setImportOpen(false);
-    onImported();
   }
 
   return (

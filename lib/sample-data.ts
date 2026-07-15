@@ -1,6 +1,8 @@
 import { addDays } from "@/lib/dates";
+import { seedEvaluations } from "@/lib/demo-storage";
 import { createEmptyAnswers, draftToEvaluation, type EvaluationDraft } from "@/lib/evaluation";
-import { generateId, seedDemoEvaluations, setDemoMode } from "@/lib/storage";
+import { generateId } from "@/lib/ids";
+import { setDemoMode } from "@/lib/storage";
 import type { QualificationStatus } from "@/types/evaluation";
 import type { AgencySettings } from "@/types/settings";
 
@@ -281,6 +283,6 @@ export function buildDemoEvaluations(settings: AgencySettings) {
  * the user's real evaluations.
  */
 export function activateDemoDataset(settings: AgencySettings): void {
-  seedDemoEvaluations(buildDemoEvaluations(settings));
+  seedEvaluations(buildDemoEvaluations(settings));
   setDemoMode(true);
 }

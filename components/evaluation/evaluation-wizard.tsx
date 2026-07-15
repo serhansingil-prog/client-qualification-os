@@ -59,13 +59,13 @@ export function EvaluationWizard({ initialDraft, settings }: EvaluationWizardPro
     [draft, settings]
   );
 
-  function persist(finalize: boolean) {
+  async function persist(finalize: boolean) {
     const evaluation = draftToEvaluation({ ...draft, isDraft: !finalize }, settings);
-    const existing = getEvaluationById(evaluation.id);
+    const existing = await getEvaluationById(evaluation.id);
     if (existing) {
-      updateEvaluation(evaluation.id, evaluation);
+      await updateEvaluation(evaluation.id, evaluation);
     } else {
-      saveEvaluation(evaluation);
+      await saveEvaluation(evaluation);
     }
     return evaluation;
   }
@@ -101,7 +101,12 @@ export function EvaluationWizard({ initialDraft, settings }: EvaluationWizardPro
       setDraft((prev) => ({ ...prev, ...values }));
     }
 
-    persist(false);
+    try {
+      await persist(false);
+    } catch {
+      toast.error("Taslak kaydedilemedi.");
+      return;
+    }
 
     if (stepIndex < STEPS.length - 1) {
       setStepIndex((index) => index + 1);
@@ -124,16 +129,24 @@ export function EvaluationWizard({ initialDraft, settings }: EvaluationWizardPro
     }
   }
 
-  function handleSaveDraft() {
-    persist(false);
-    toast.success("Taslak kaydedildi.");
-    router.push("/evaluations");
+  async function handleSaveDraft() {
+    try {
+      await persist(false);
+      toast.success("Taslak kaydedildi.");
+      router.push("/evaluations");
+    } catch {
+      toast.error("Taslak kaydedilemedi.");
+    }
   }
 
-  function handleComplete() {
-    const evaluation = persist(true);
-    toast.success("Değerlendirme tamamlandı.");
-    router.push(`/evaluations/${evaluation.id}`);
+  async function handleComplete() {
+    try {
+      const evaluation = await persist(true);
+      toast.success("Değerlendirme tamamlandı.");
+      router.push(`/evaluations/${evaluation.id}`);
+    } catch {
+      toast.error("Değerlendirme kaydedilemedi.");
+    }
   }
 
   const progressPercentage = ((stepIndex + 1) / STEPS.length) * 100;

@@ -31,15 +31,23 @@ export default function SettingsPage() {
     setFormSettings((prev) => ({ ...prev, ...update }));
   }
 
-  function handleSave() {
-    updateSettings(formSettings);
-    toast.success("Ayarlar kaydedildi.");
+  async function handleSave() {
+    try {
+      await updateSettings(formSettings);
+      toast.success("Ayarlar kaydedildi.");
+    } catch {
+      toast.error("Ayarlar kaydedilemedi.");
+    }
   }
 
-  function handleReset() {
-    const defaults = resetSettings();
-    setFormSettings(defaults);
-    toast.success("Ayarlar varsayılana döndürüldü.");
+  async function handleReset() {
+    try {
+      const defaults = await resetSettings();
+      setFormSettings(defaults);
+      toast.success("Ayarlar varsayılana döndürüldü.");
+    } catch {
+      toast.error("Ayarlar sıfırlanamadı.");
+    }
   }
 
   if (!isLoaded) {

@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { cn } from "@/lib/utils";
 import { getActiveNavHref, NAV_ITEMS } from "@/lib/nav";
 import { DemoModeToggle } from "@/components/shared/demo-mode-toggle";
+import { UserMenu } from "@/components/shared/user-menu";
 
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
@@ -88,7 +89,8 @@ export function AppHeader() {
                 );
               })}
             </nav>
-            <div className="mt-auto p-4">
+            <div className="mt-auto space-y-3 p-4">
+              <UserMenu />
               <DemoModeToggle />
             </div>
           </SheetContent>

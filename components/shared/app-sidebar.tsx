@@ -6,6 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getActiveNavHref, NAV_ITEMS } from "@/lib/nav";
 import { DemoModeToggle } from "@/components/shared/demo-mode-toggle";
+import { UserMenu } from "@/components/shared/user-menu";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -39,7 +40,8 @@ export function AppSidebar() {
           );
         })}
       </nav>
-      <div className="border-t p-4">
+      <div className="space-y-3 border-t p-4">
+        <UserMenu />
         <DemoModeToggle />
       </div>
     </aside>

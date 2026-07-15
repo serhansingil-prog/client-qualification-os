@@ -4,6 +4,7 @@ import { CRITERIA_DEFINITIONS } from "@/lib/criteria";
 export const APP_VERSION = "1.0.0";
 export const SETTINGS_STORAGE_KEY = "cqos_settings";
 export const EVALUATIONS_STORAGE_KEY = "cqos_evaluations";
+export const DEMO_EVALUATIONS_STORAGE_KEY = "cqos_demo_evaluations";
 export const DEMO_MODE_STORAGE_KEY = "cqos_demo_mode";
 
 export const DEFAULT_TECH_STACK = [

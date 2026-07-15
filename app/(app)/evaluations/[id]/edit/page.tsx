@@ -17,10 +17,19 @@ export default function EditEvaluationPage({ params }: { params: Promise<{ id: s
   const [draft, setDraft] = useState<EvaluationDraft | null | undefined>(undefined);
 
   useEffect(() => {
-    const evaluation = getEvaluationById(id);
-    // localStorage is unavailable during SSR; load it after mount to avoid hydration mismatches.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDraft(evaluation ? evaluationToDraft(evaluation) : null);
+    let cancelled = false;
+    async function load() {
+      try {
+        const evaluation = await getEvaluationById(id);
+        if (!cancelled) setDraft(evaluation ? evaluationToDraft(evaluation) : null);
+      } catch {
+        if (!cancelled) setDraft(null);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   return (

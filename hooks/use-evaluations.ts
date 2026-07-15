@@ -13,51 +13,58 @@ import type { ClientEvaluation } from "@/types/evaluation";
 export function useEvaluations() {
   const [evaluations, setEvaluations] = useState<ClientEvaluation[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const refresh = useCallback(() => {
-    setEvaluations(getEvaluations());
+  const refresh = useCallback(async () => {
+    try {
+      setError(null);
+      const data = await getEvaluations();
+      setEvaluations(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Değerlendirmeler yüklenemedi.");
+    } finally {
+      setIsLoaded(true);
+    }
   }, []);
 
   useEffect(() => {
-    // localStorage is unavailable during SSR; load it after mount to avoid hydration mismatches.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
-    setIsLoaded(true);
   }, [refresh]);
 
   const remove = useCallback(
-    (id: string) => {
-      deleteEvaluationInStorage(id);
-      refresh();
+    async (id: string) => {
+      await deleteEvaluationInStorage(id);
+      await refresh();
     },
     [refresh]
   );
 
   const removeMany = useCallback(
-    (ids: string[]) => {
-      const count = deleteEvaluationsInStorage(ids);
-      refresh();
+    async (ids: string[]) => {
+      const count = await deleteEvaluationsInStorage(ids);
+      await refresh();
       return count;
     },
     [refresh]
   );
 
   const archive = useCallback(
-    (id: string, isArchived = true) => {
-      archiveEvaluationInStorage(id, isArchived);
-      refresh();
+    async (id: string, isArchived = true) => {
+      await archiveEvaluationInStorage(id, isArchived);
+      await refresh();
     },
     [refresh]
   );
 
   const duplicate = useCallback(
-    (id: string) => {
-      const copy = duplicateEvaluationInStorage(id);
-      refresh();
+    async (id: string) => {
+      const copy = await duplicateEvaluationInStorage(id);
+      await refresh();
       return copy;
     },
     [refresh]
   );
 
-  return { evaluations, isLoaded, refresh, remove, removeMany, archive, duplicate };
+  return { evaluations, isLoaded, error, refresh, remove, removeMany, archive, duplicate };
 }

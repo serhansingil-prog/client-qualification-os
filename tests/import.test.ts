@@ -1,4 +1,13 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createClient } from "@/lib/supabase/client";
+import type { FakeSupabaseClient } from "./mocks/supabase";
+
+vi.mock("@/lib/supabase/client", async () => {
+  const { createFakeSupabaseClient } = await import("./mocks/supabase");
+  const client = createFakeSupabaseClient();
+  return { createClient: () => client };
+});
+
 import { getEvaluations, importData, saveEvaluation } from "@/lib/storage";
 import { APP_VERSION, DEFAULT_SETTINGS } from "@/lib/constants";
 import type { ClientEvaluation } from "@/types/evaluation";
@@ -37,52 +46,54 @@ function buildExport(evaluations: ClientEvaluation[]): ExportFormat {
 
 beforeEach(() => {
   window.localStorage.clear();
+  (createClient() as unknown as FakeSupabaseClient).reset();
 });
 
 describe("importData", () => {
-  it("reports a descriptive error for invalid JSON", () => {
-    const result = importData("{not valid json");
+  it("reports a descriptive error for invalid JSON", async () => {
+    const result = await importData("{not valid json");
     expect(result.success).toBe(false);
     expect(result.errors[0]).toMatch(/JSON/i);
   });
 
-  it("reports a descriptive error when the JSON does not match the export schema", () => {
-    const result = importData(JSON.stringify({ hello: "world" }));
+  it("reports a descriptive error when the JSON does not match the export schema", async () => {
+    const result = await importData(JSON.stringify({ hello: "world" }));
     expect(result.success).toBe(false);
     expect(result.errors.length).toBeGreaterThan(0);
   });
 
-  it("imports valid evaluations and merges them with existing data", () => {
+  it("imports valid evaluations and merges them with existing data", async () => {
     const existing = buildEvaluation();
-    saveEvaluation(existing);
+    await saveEvaluation(existing);
 
     const incoming = buildEvaluation();
-    const result = importData(JSON.stringify(buildExport([incoming])), "merge");
+    const result = await importData(JSON.stringify(buildExport([incoming])), "merge");
 
     expect(result.success).toBe(true);
     expect(result.importedCount).toBe(1);
-    expect(getEvaluations()).toHaveLength(2);
+    expect(await getEvaluations()).toHaveLength(2);
   });
 
-  it("detects duplicate records by id and skips them", () => {
+  it("detects duplicate records by id and skips them", async () => {
     const existing = buildEvaluation();
-    saveEvaluation(existing);
+    await saveEvaluation(existing);
 
-    const result = importData(JSON.stringify(buildExport([existing])), "merge");
+    const result = await importData(JSON.stringify(buildExport([existing])), "merge");
 
     expect(result.duplicateCount).toBe(1);
     expect(result.importedCount).toBe(0);
-    expect(getEvaluations()).toHaveLength(1);
+    expect(await getEvaluations()).toHaveLength(1);
   });
 
-  it("overwrites existing data when mode is overwrite", () => {
-    saveEvaluation(buildEvaluation());
+  it("overwrites existing data when mode is overwrite", async () => {
+    await saveEvaluation(buildEvaluation());
     const incoming = buildEvaluation();
 
-    const result = importData(JSON.stringify(buildExport([incoming])), "overwrite");
+    const result = await importData(JSON.stringify(buildExport([incoming])), "overwrite");
 
     expect(result.success).toBe(true);
-    expect(getEvaluations()).toHaveLength(1);
-    expect(getEvaluations()[0].id).toBe(incoming.id);
+    const evaluations = await getEvaluations();
+    expect(evaluations).toHaveLength(1);
+    expect(evaluations[0].id).toBe(incoming.id);
   });
 });

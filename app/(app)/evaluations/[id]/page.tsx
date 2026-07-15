@@ -36,9 +36,22 @@ export default function EvaluationDetailPage({ params }: { params: Promise<{ id:
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   useEffect(() => {
-    // localStorage is unavailable during SSR; load it after mount to avoid hydration mismatches.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setEvaluation(getEvaluationById(id) ?? null);
+    let cancelled = false;
+    async function load() {
+      try {
+        const data = await getEvaluationById(id);
+        if (!cancelled) setEvaluation(data ?? null);
+      } catch {
+        if (!cancelled) {
+          toast.error("Değerlendirme yüklenirken bir hata oluştu.");
+          setEvaluation(null);
+        }
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   if (evaluation === undefined || !settingsLoaded) {
@@ -87,11 +100,15 @@ export default function EvaluationDetailPage({ params }: { params: Promise<{ id:
             <Button
               variant="outline"
               className="gap-1.5"
-              onClick={() => {
-                const copy = duplicateEvaluation(evaluation.id);
-                if (copy) {
-                  toast.success("Değerlendirme kopyalandı.");
-                  router.push(`/evaluations/${copy.id}/edit`);
+              onClick={async () => {
+                try {
+                  const copy = await duplicateEvaluation(evaluation.id);
+                  if (copy) {
+                    toast.success("Değerlendirme kopyalandı.");
+                    router.push(`/evaluations/${copy.id}/edit`);
+                  }
+                } catch {
+                  toast.error("Değerlendirme kopyalanamadı.");
                 }
               }}
             >
@@ -101,10 +118,14 @@ export default function EvaluationDetailPage({ params }: { params: Promise<{ id:
             <Button
               variant="outline"
               className="gap-1.5"
-              onClick={() => {
-                const updated = archiveEvaluation(evaluation.id, !evaluation.isArchived);
-                if (updated) setEvaluation(updated);
-                toast.success(updated?.isArchived ? "Arşivlendi." : "Arşivden çıkarıldı.");
+              onClick={async () => {
+                try {
+                  const updated = await archiveEvaluation(evaluation.id, !evaluation.isArchived);
+                  if (updated) setEvaluation(updated);
+                  toast.success(updated?.isArchived ? "Arşivlendi." : "Arşivden çıkarıldı.");
+                } catch {
+                  toast.error("İşlem gerçekleştirilemedi.");
+                }
               }}
             >
               {evaluation.isArchived ? (
@@ -200,10 +221,14 @@ export default function EvaluationDetailPage({ params }: { params: Promise<{ id:
         title="Değerlendirmeyi sil"
         description="Bu değerlendirmeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
         confirmLabel="Sil"
-        onConfirm={() => {
-          deleteEvaluation(evaluation.id);
-          toast.success("Değerlendirme silindi.");
-          router.push("/evaluations");
+        onConfirm={async () => {
+          try {
+            await deleteEvaluation(evaluation.id);
+            toast.success("Değerlendirme silindi.");
+            router.push("/evaluations");
+          } catch {
+            toast.error("Değerlendirme silinemedi.");
+          }
         }}
       />
     </div>

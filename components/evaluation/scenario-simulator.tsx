@@ -60,15 +60,19 @@ export function ScenarioSimulator({ evaluation, settings }: ScenarioSimulatorPro
     });
   }
 
-  function applyChanges() {
+  async function applyChanges() {
     if (changes.length === 0) return;
     const nextAnswers = evaluation.answers.map((answer) => {
       const change = changes.find((c) => c.criterionId === answer.criterionId);
       return change ? { ...answer, status: change.newStatus } : answer;
     });
-    updateEvaluation(evaluation.id, { answers: nextAnswers });
-    toast.success("Değişiklikler değerlendirmeye uygulandı.");
-    router.refresh();
+    try {
+      await updateEvaluation(evaluation.id, { answers: nextAnswers });
+      toast.success("Değişiklikler değerlendirmeye uygulandı.");
+      router.refresh();
+    } catch {
+      toast.error("Değişiklikler uygulanamadı.");
+    }
   }
 
   return (

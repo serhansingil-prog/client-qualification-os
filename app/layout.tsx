@@ -4,9 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
-import { AppSidebar } from "@/components/shared/app-sidebar";
-import { AppHeader } from "@/components/shared/app-header";
-import { MobileBottomNav } from "@/components/shared/mobile-bottom-nav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,14 +35,7 @@ export default function RootLayout({
       <body className="min-h-full">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <TooltipProvider>
-            <div className="flex min-h-full">
-              <AppSidebar />
-              <div className="flex min-h-full flex-1 flex-col">
-                <AppHeader />
-                <main className="flex-1 px-4 pb-20 pt-6 md:px-8 md:pb-8">{children}</main>
-              </div>
-            </div>
-            <MobileBottomNav />
+            {children}
             <Toaster />
           </TooltipProvider>
         </ThemeProvider>
