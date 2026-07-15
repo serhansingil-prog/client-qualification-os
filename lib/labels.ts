@@ -9,11 +9,11 @@ export const DECISION_LABELS: Record<DecisionLevel, string> = {
 };
 
 export const DECISION_COLOR_CLASSES: Record<DecisionLevel, string> = {
-  hell_yes: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900",
-  qualified_yes: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900",
-  yellow_flag: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900",
-  soft_no: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-900",
-  hard_no: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900",
+  hell_yes: "bg-status-positive-strong text-status-positive-strong-foreground border-transparent",
+  qualified_yes: "bg-status-positive-soft text-status-positive-soft-foreground border-transparent",
+  yellow_flag: "bg-status-caution text-status-caution-foreground border-transparent",
+  soft_no: "bg-status-negative-soft text-status-negative-soft-foreground border-transparent",
+  hard_no: "bg-status-negative-strong text-status-negative-strong-foreground border-transparent",
 };
 
 export const CONFIDENCE_LABELS: Record<ConfidenceLevel, string> = {
@@ -30,10 +30,10 @@ export const QUALIFICATION_STATUS_LABELS: Record<QualificationStatus, string> = 
 };
 
 export const QUALIFICATION_STATUS_COLOR_CLASSES: Record<QualificationStatus, string> = {
-  qualified: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-400 dark:border-green-900",
-  uncertain: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900",
-  disqualified: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900",
-  not_evaluated: "bg-gray-50 text-gray-500 border-gray-200 dark:bg-gray-900/40 dark:text-gray-400 dark:border-gray-800",
+  qualified: "bg-status-positive-soft text-status-positive-soft-foreground border-transparent",
+  uncertain: "bg-status-caution text-status-caution-foreground border-transparent",
+  disqualified: "bg-status-negative-strong text-status-negative-strong-foreground border-transparent",
+  not_evaluated: "bg-muted text-muted-foreground border-transparent",
 };
 
 export const RISK_SEVERITY_LABELS: Record<RiskSeverity, string> = {
@@ -44,8 +44,8 @@ export const RISK_SEVERITY_LABELS: Record<RiskSeverity, string> = {
 };
 
 export const RISK_SEVERITY_COLOR_CLASSES: Record<RiskSeverity, string> = {
-  low: "bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-900/40 dark:text-gray-400 dark:border-gray-800",
-  medium: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900",
-  high: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-900",
-  critical: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900",
+  low: "bg-muted text-muted-foreground border-transparent",
+  medium: "bg-status-caution text-status-caution-foreground border-transparent",
+  high: "bg-status-negative-soft text-status-negative-soft-foreground border-transparent",
+  critical: "bg-status-negative-strong text-status-negative-strong-foreground border-transparent",
 };

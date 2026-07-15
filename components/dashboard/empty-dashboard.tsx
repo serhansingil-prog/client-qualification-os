@@ -31,6 +31,7 @@ export function EmptyDashboard({ settings }: EmptyDashboardProps) {
         <>
           <Button
             nativeButton={false}
+            className="bg-accent-2 text-accent-2-foreground hover:bg-accent-2/90"
             render={<Link href="/evaluations/new">Yeni değerlendirme oluştur</Link>}
           />
           <Button variant="outline" onClick={loadSample}>

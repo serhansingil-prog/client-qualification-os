@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { getActiveNavHref, NAV_ITEMS } from "@/lib/nav";
+import { AdminNavLink } from "@/components/shared/admin-nav-link";
 import { DemoModeToggle } from "@/components/shared/demo-mode-toggle";
 import { UserMenu } from "@/components/shared/user-menu";
 
@@ -91,6 +92,7 @@ export function AppHeader() {
             </nav>
             <div className="mt-auto space-y-3 p-4">
               <UserMenu />
+              <AdminNavLink />
               <DemoModeToggle />
             </div>
           </SheetContent>

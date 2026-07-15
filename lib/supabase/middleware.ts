@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = ["/login", "/signup"];
+const PENDING_PATH = "/pending";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -39,6 +40,25 @@ export async function updateSession(request: NextRequest) {
 
   if (user && isPublicPath) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const isApproved = profile?.status === "approved";
+    const isPendingPath = request.nextUrl.pathname.startsWith(PENDING_PATH);
+
+    if (!isApproved && !isPendingPath) {
+      return NextResponse.redirect(new URL(PENDING_PATH, request.url));
+    }
+
+    if (isApproved && isPendingPath) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
   return response;

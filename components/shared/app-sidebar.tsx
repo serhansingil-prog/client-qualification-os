@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getActiveNavHref, NAV_ITEMS } from "@/lib/nav";
+import { AdminNavLink } from "@/components/shared/admin-nav-link";
 import { DemoModeToggle } from "@/components/shared/demo-mode-toggle";
 import { UserMenu } from "@/components/shared/user-menu";
 
@@ -42,6 +43,7 @@ export function AppSidebar() {
       </nav>
       <div className="space-y-3 border-t p-4">
         <UserMenu />
+        <AdminNavLink />
         <DemoModeToggle />
       </div>
     </aside>
