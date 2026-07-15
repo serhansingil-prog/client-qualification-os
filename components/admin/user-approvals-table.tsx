@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { MaskedEmail } from "@/components/shared/masked-email";
 import {
   Table,
   TableBody,
@@ -100,7 +101,9 @@ export function UserApprovalsTable({ profiles }: UserApprovalsTableProps) {
                   aria-label={`${profile.email} seç`}
                 />
               </TableCell>
-              <TableCell>{profile.email}</TableCell>
+              <TableCell>
+                <MaskedEmail email={profile.email} />
+              </TableCell>
               <TableCell>{formatDateTime(profile.created_at)}</TableCell>
               <TableCell>
                 <Badge variant={STATUS_VARIANTS[profile.status]}>
