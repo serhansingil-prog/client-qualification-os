@@ -23,6 +23,8 @@ export function isPastDate(isoDate: string, referenceISODate?: string): boolean 
   return dateUtc < referenceUtc;
 }
 
+const APP_TIME_ZONE = "Europe/Istanbul";
+
 export function formatDate(isoDate?: string): string {
   if (!isoDate) return "-";
   const date = new Date(isoDate);
@@ -31,6 +33,7 @@ export function formatDate(isoDate?: string): string {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: APP_TIME_ZONE,
   }).format(date);
 }
 
@@ -44,6 +47,7 @@ export function formatDateTime(isoDate?: string): string {
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: APP_TIME_ZONE,
   }).format(date);
 }
 
@@ -55,6 +59,7 @@ export function formatDateShort(isoDate?: string): string {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
+    timeZone: APP_TIME_ZONE,
   }).format(date);
 }
 
