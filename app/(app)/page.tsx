@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { LoadingState } from "@/components/shared/loading-state";
 import { EmptyDashboard } from "@/components/dashboard/empty-dashboard";
 import { DemoModeBanner } from "@/components/shared/demo-mode-banner";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DashboardMetricsGrid } from "@/components/dashboard/dashboard-metrics";
 import { DecisionChart } from "@/components/dashboard/decision-chart";
 import { ScoreDistributionChart } from "@/components/dashboard/score-distribution-chart";
@@ -73,57 +74,78 @@ export default function DashboardPage() {
 
       {demoMode ? <DemoModeBanner /> : null}
 
-      <DashboardMetricsGrid metrics={metrics} currency={settings.defaultCurrency} />
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <DecisionChart distribution={metrics.decisionDistribution} />
-        <ScoreDistributionChart distribution={metrics.scoreDistribution} />
-        <MetricBarChart
-          title="Son 12 Aya Göre Değerlendirme Sayısı"
-          data={evaluationsByMonthData}
-          summary={
-            evaluationsByMonthData.some((item) => item.value > 0)
-              ? "Aylık değerlendirme sayıları gösterilmektedir."
-              : "Henüz veri yok."
-          }
-        />
-        <MonthlyAcceptanceChart data={metrics.acceptanceRateByMonth} />
-        <CriterionPerformanceChart averageScoreByCriterion={metrics.averageScoreByCriterion} />
-        <MetricBarChart
-          title="En Sık Görülen Kritik Riskler"
-          data={topCriticalRisksData}
-          layout="vertical"
-          summary={
-            topCriticalRisksData.length > 0
-              ? `En sık görülen risk: ${topCriticalRisksData[0]?.label}.`
-              : "Henüz kritik risk kaydedilmedi."
-          }
-        />
-        <MetricBarChart
-          title="Müşteri Kaynaklarına Göre Performans"
-          data={leadSourceData}
-          valueSuffix="%"
-          layout="vertical"
-          summary={
-            leadSourceData.length > 0
-              ? `En yüksek kabul oranına sahip kaynak: ${leadSourceData[0]?.label}.`
-              : "Henüz veri yok."
-          }
-        />
-        <MetricBarChart
-          title="Sektörlere Göre Kabul Oranı"
-          data={industryData}
-          valueSuffix="%"
-          layout="vertical"
-          summary={
-            industryData.length > 0
-              ? `En yüksek kabul oranına sahip sektör: ${industryData[0]?.label}.`
-              : "Henüz veri yok."
-          }
-        />
+      <div>
+        <h2 className="mb-3 text-sm font-semibold text-muted-foreground">Genel Bakış</h2>
+        <DashboardMetricsGrid metrics={metrics} currency={settings.defaultCurrency} />
       </div>
 
-      <RecentEvaluations evaluations={evaluations} />
+      <Accordion multiple className="space-y-4">
+        <AccordionItem value="stats" className="rounded-lg border bg-card px-4 not-last:border-b-0">
+          <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
+            İstatistikler
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid gap-6 pt-2 lg:grid-cols-2">
+              <DecisionChart distribution={metrics.decisionDistribution} />
+              <ScoreDistributionChart distribution={metrics.scoreDistribution} />
+              <MetricBarChart
+                title="Son 12 Aya Göre Değerlendirme Sayısı"
+                data={evaluationsByMonthData}
+                summary={
+                  evaluationsByMonthData.some((item) => item.value > 0)
+                    ? "Aylık değerlendirme sayıları gösterilmektedir."
+                    : "Henüz veri yok."
+                }
+              />
+              <MonthlyAcceptanceChart data={metrics.acceptanceRateByMonth} />
+              <CriterionPerformanceChart averageScoreByCriterion={metrics.averageScoreByCriterion} />
+              <MetricBarChart
+                title="En Sık Görülen Kritik Riskler"
+                data={topCriticalRisksData}
+                layout="vertical"
+                summary={
+                  topCriticalRisksData.length > 0
+                    ? `En sık görülen risk: ${topCriticalRisksData[0]?.label}.`
+                    : "Henüz kritik risk kaydedilmedi."
+                }
+              />
+              <MetricBarChart
+                title="Müşteri Kaynaklarına Göre Performans"
+                data={leadSourceData}
+                valueSuffix="%"
+                layout="vertical"
+                summary={
+                  leadSourceData.length > 0
+                    ? `En yüksek kabul oranına sahip kaynak: ${leadSourceData[0]?.label}.`
+                    : "Henüz veri yok."
+                }
+              />
+              <MetricBarChart
+                title="Sektörlere Göre Kabul Oranı"
+                data={industryData}
+                valueSuffix="%"
+                layout="vertical"
+                summary={
+                  industryData.length > 0
+                    ? `En yüksek kabul oranına sahip sektör: ${industryData[0]?.label}.`
+                    : "Henüz veri yok."
+                }
+              />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="recent" className="rounded-lg border bg-card px-4 not-last:border-b-0">
+          <AccordionTrigger className="py-4 text-base font-semibold hover:no-underline">
+            Son Değerlendirmeler
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="pt-2">
+              <RecentEvaluations evaluations={evaluations} />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
