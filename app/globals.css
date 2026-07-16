@@ -1,0 +1,180 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-accent-2-foreground: var(--accent-2-foreground);
+  --color-accent-2: var(--accent-2);
+  --color-status-negative-strong-foreground: var(--status-negative-strong-foreground);
+  --color-status-negative-strong: var(--status-negative-strong);
+  --color-status-negative-soft-foreground: var(--status-negative-soft-foreground);
+  --color-status-negative-soft: var(--status-negative-soft);
+  --color-status-caution-foreground: var(--status-caution-foreground);
+  --color-status-caution: var(--status-caution);
+  --color-status-positive-soft-foreground: var(--status-positive-soft-foreground);
+  --color-status-positive-soft: var(--status-positive-soft);
+  --color-status-positive-strong-foreground: var(--status-positive-strong-foreground);
+  --color-status-positive-strong: var(--status-positive-strong);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: #f4f2f3;
+  --foreground: #292f36;
+  --card: #f9eae1;
+  --card-foreground: #292f36;
+  --popover: #f9eae1;
+  --popover-foreground: #292f36;
+  --primary: #028090;
+  --primary-foreground: #ffffff;
+  --secondary: #f2ddc9;
+  --secondary-foreground: #292f36;
+  --muted: #f2ddc9;
+  --muted-foreground: #6b7178;
+  --accent: #f2ddc9;
+  --accent-foreground: #292f36;
+  --accent-2: #f18f01;
+  --accent-2-foreground: #292f36;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: rgba(41, 47, 54, 0.14);
+  --input: rgba(41, 47, 54, 0.14);
+  --ring: #028090;
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: #f9eae1;
+  --sidebar-foreground: #292f36;
+  --sidebar-primary: #028090;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f2ddc9;
+  --sidebar-accent-foreground: #292f36;
+  --sidebar-border: rgba(41, 47, 54, 0.14);
+  --sidebar-ring: #028090;
+
+  /* Decision / severity chips — deliberately separate from the brand
+     accents above so status meaning never depends on the same hues used
+     for navigation or CTAs. Endpoints (positive-strong / negative-strong)
+     are solid; the three middle states are soft tints. */
+  --status-positive-strong: #1b8a5a;
+  --status-positive-strong-foreground: #ffffff;
+  --status-positive-soft: rgba(79, 157, 110, 0.16);
+  --status-positive-soft-foreground: #2f6b48;
+  --status-caution: rgba(221, 161, 94, 0.24);
+  --status-caution-foreground: #8a5a25;
+  --status-negative-soft: rgba(193, 18, 31, 0.13);
+  --status-negative-soft-foreground: #a10f1a;
+  --status-negative-strong: #780000;
+  --status-negative-strong-foreground: #ffffff;
+}
+
+.dark {
+  --background: #1c2025;
+  --foreground: #f4f2f3;
+  --card: #292f36;
+  --card-foreground: #f4f2f3;
+  --popover: #292f36;
+  --popover-foreground: #f4f2f3;
+  --primary: #2bb1c2;
+  --primary-foreground: #0e1a1c;
+  --secondary: #333a42;
+  --secondary-foreground: #f4f2f3;
+  --muted: #333a42;
+  --muted-foreground: #9aa1a8;
+  --accent: #333a42;
+  --accent-foreground: #f4f2f3;
+  --accent-2: #ffab2e;
+  --accent-2-foreground: #241600;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: rgba(244, 242, 243, 0.12);
+  --input: rgba(244, 242, 243, 0.12);
+  --ring: #2bb1c2;
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: #292f36;
+  --sidebar-foreground: #f4f2f3;
+  --sidebar-primary: #2bb1c2;
+  --sidebar-primary-foreground: #0e1a1c;
+  --sidebar-accent: #333a42;
+  --sidebar-accent-foreground: #f4f2f3;
+  --sidebar-border: rgba(244, 242, 243, 0.12);
+  --sidebar-ring: #2bb1c2;
+
+  --status-positive-strong: #26a06a;
+  --status-positive-strong-foreground: #06150e;
+  --status-positive-soft: rgba(79, 157, 110, 0.22);
+  --status-positive-soft-foreground: #86d9ab;
+  --status-caution: rgba(221, 161, 94, 0.22);
+  --status-caution-foreground: #f0c17a;
+  --status-negative-soft: rgba(255, 107, 107, 0.18);
+  --status-negative-soft-foreground: #ff8a8a;
+  --status-negative-strong: #a11c1c;
+  --status-negative-strong-foreground: #ffece7;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+
+  /* Edge/IE add their own show/hide-password icon on top of ours
+     (MaskableInput) once a password-type field has content — hide it so
+     only our custom toggle shows. */
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear {
+    display: none;
+  }
+}
