@@ -69,7 +69,9 @@ export default async function RecentActionsPage({
                     <MaskedEmail email={entry.actor_email} />
                   </TableCell>
                   <TableCell>{ACTION_LABELS[entry.action] ?? entry.action}</TableCell>
-                  <TableCell>{entry.target_email}</TableCell>
+                  <TableCell>
+                    <MaskedEmail email={entry.target_email} />
+                  </TableCell>
                   <TableCell>{formatDateTime(entry.created_at)}</TableCell>
                 </TableRow>
               ))}
