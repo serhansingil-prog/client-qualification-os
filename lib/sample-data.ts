@@ -1301,7 +1301,7 @@ const REAL_ESTATE_OFFICE_SPECS: DemoRecordSpec[] = [
     clientName: "Serhat Aydın İnşaat",
     companyName: "Serhat Aydın İnşaat Ltd.",
     contactName: "Caner Öztürk",
-    email: "caner@serhataydin.com",
+    email: "caner@example.com",
     industry: "Geliştirici/Müteahhit",
     companySize: "1-10",
     projectName: "Yeni Proje Pazarlama Danışmanlığı",
