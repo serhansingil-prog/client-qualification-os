@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CRITERIA_DEFINITIONS } from "@/lib/criteria";
+import { getCriteriaDefinitions } from "@/lib/criteria";
 import { DECISION_LABELS } from "@/lib/labels";
 import type { AgencySettings } from "@/types/settings";
 
@@ -95,7 +95,7 @@ export function ScoringSettingsForm({ settings, onChange }: ScoringSettingsFormP
           <CardTitle className="text-base">Kriter Ağırlıkları</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2">
-          {CRITERIA_DEFINITIONS.map((criterion) => (
+          {getCriteriaDefinitions(settings.sector).map((criterion) => (
             <div key={criterion.id} className="flex items-center justify-between gap-3 rounded-md border p-3">
               <Label htmlFor={`weight-${criterion.id}`} className="font-normal">
                 {criterion.name}

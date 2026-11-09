@@ -14,10 +14,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResultSummary } from "@/components/evaluation/result-summary";
+import { VoiceSummaryButton } from "@/components/evaluation/voice-summary-button";
 import { ScenarioSimulator } from "@/components/evaluation/scenario-simulator";
 import { MessageGenerator } from "@/components/messages/message-generator";
 import { useSettings } from "@/hooks/use-settings";
+import { useDemoSector } from "@/hooks/use-demo-sector";
 import { calculateEvaluationResult } from "@/lib/scoring";
+import { getCriteriaDefinitions, getSectorAdjustedSettings } from "@/lib/criteria";
 import { formatCurrency } from "@/lib/currency";
 import { formatDate } from "@/lib/dates";
 import {
@@ -32,6 +35,7 @@ export default function EvaluationDetailPage({ params }: { params: Promise<{ id:
   const { id } = use(params);
   const router = useRouter();
   const { settings, isLoaded: settingsLoaded } = useSettings();
+  const demoSector = useDemoSector();
   const [evaluation, setEvaluation] = useState<ClientEvaluation | null | undefined>(undefined);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
@@ -76,7 +80,9 @@ export default function EvaluationDetailPage({ params }: { params: Promise<{ id:
     );
   }
 
-  const result = calculateEvaluationResult(evaluation, settings);
+  const effectiveSector = evaluation.isDemo ? demoSector : settings.sector;
+  const adjustedSettings = getSectorAdjustedSettings(settings, effectiveSector);
+  const result = calculateEvaluationResult(evaluation, adjustedSettings, getCriteriaDefinitions(effectiveSector));
 
   return (
     <div>
@@ -155,11 +161,13 @@ export default function EvaluationDetailPage({ params }: { params: Promise<{ id:
           <TabsTrigger value="message">Mesaj Oluşturucu</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="result" className="mt-6">
+        <TabsContent value="result" className="mt-6 space-y-4">
+          <VoiceSummaryButton evaluation={evaluation} result={result} />
           <ResultSummary
             evaluation={evaluation}
             result={result}
             decisionThresholds={settings.decisionThresholds}
+            sector={effectiveSector}
           />
         </TabsContent>
 
@@ -207,11 +215,11 @@ export default function EvaluationDetailPage({ params }: { params: Promise<{ id:
         </TabsContent>
 
         <TabsContent value="simulator" className="mt-6">
-          <ScenarioSimulator evaluation={evaluation} settings={settings} />
+          <ScenarioSimulator evaluation={evaluation} settings={adjustedSettings} sector={effectiveSector} />
         </TabsContent>
 
         <TabsContent value="message" className="mt-6">
-          <MessageGenerator evaluation={evaluation} settings={settings} result={result} />
+          <MessageGenerator evaluation={evaluation} settings={adjustedSettings} result={result} />
         </TabsContent>
       </Tabs>
 

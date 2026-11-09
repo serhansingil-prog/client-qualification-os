@@ -128,6 +128,9 @@ export const decisionThresholdSchema = z.object({
 
 export const agencySettingsSchema = z.object({
   version: z.number(),
+  // .default() so settings saved before the sector field existed still
+  // parse instead of silently falling back to DEFAULT_SETTINGS entirely.
+  sector: z.enum(["automation", "ads", "real_estate"]).default("automation"),
   agencyName: z.string(),
   userName: z.string(),
   defaultCurrency: z.string().min(1),

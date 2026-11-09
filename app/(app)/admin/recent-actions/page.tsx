@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { MaskedEmail } from "@/components/shared/masked-email";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
@@ -12,12 +11,13 @@ import {
 } from "@/components/ui/table";
 import { formatDateTime } from "@/lib/dates";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdminPage } from "@/lib/auth/require-admin";
 
 const ACTION_LABELS: Record<string, string> = {
   approve: "Onayladı",
   reject: "Reddetti",
   archive: "Arşivledi",
+  role_change: "Rol değiştirdi",
 };
 
 const PAGE_SIZE = 5;
@@ -27,14 +27,7 @@ export default async function RecentActionsPage({
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-    redirect("/");
-  }
+  await requireAdminPage();
 
   const { page: pageParam } = await searchParams;
   const currentPage = Math.max(1, Number(pageParam) || 1);

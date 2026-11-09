@@ -14,16 +14,20 @@ import { MonthlyAcceptanceChart } from "@/components/dashboard/monthly-acceptanc
 import { MetricBarChart } from "@/components/dashboard/metric-bar-chart";
 import { RecentEvaluations } from "@/components/dashboard/recent-evaluations";
 import { EvaluationGraphView } from "@/components/dashboard/evaluation-graph-view";
+import { InsightsAssistant } from "@/components/dashboard/insights-assistant";
 import { useEvaluations } from "@/hooks/use-evaluations";
 import { useSettings } from "@/hooks/use-settings";
 import { useDemoMode } from "@/hooks/use-demo-mode";
 import { calculateDashboardMetrics } from "@/lib/dashboard";
 import { buildEvaluationGraph } from "@/lib/queries/evaluation-graph";
+import { useDemoSector } from "@/hooks/use-demo-sector";
 
 export default function DashboardPage() {
   const { evaluations: allEvaluations, isLoaded: evaluationsLoaded } = useEvaluations();
   const { settings, isLoaded: settingsLoaded } = useSettings();
   const { demoMode, isLoaded: demoModeLoaded } = useDemoMode();
+  const demoSector = useDemoSector();
+  const effectiveSector = demoMode ? demoSector : settings.sector;
 
   const evaluations = useMemo(
     () => allEvaluations.filter((evaluation) => Boolean(evaluation.isDemo) === demoMode),
@@ -31,7 +35,10 @@ export default function DashboardPage() {
   );
 
   const metrics = useMemo(() => calculateDashboardMetrics(evaluations), [evaluations]);
-  const graph = useMemo(() => buildEvaluationGraph(evaluations), [evaluations]);
+  const graph = useMemo(
+    () => buildEvaluationGraph(evaluations, effectiveSector),
+    [evaluations, effectiveSector]
+  );
 
   const isLoaded = evaluationsLoaded && settingsLoaded && demoModeLoaded;
 
@@ -83,6 +90,7 @@ export default function DashboardPage() {
           <TabsTrigger value="stats">İstatistikler</TabsTrigger>
           <TabsTrigger value="recent">Son Değerlendirmeler</TabsTrigger>
           <TabsTrigger value="graph">Bağlantı Haritası</TabsTrigger>
+          <TabsTrigger value="assistant">Asistan</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-4">
@@ -171,6 +179,10 @@ export default function DashboardPage() {
           ) : (
             <p className="py-8 text-center text-sm text-muted-foreground">Henüz veri yok.</p>
           )}
+        </TabsContent>
+
+        <TabsContent value="assistant" className="mt-4" keepMounted>
+          <InsightsAssistant metrics={metrics} />
         </TabsContent>
       </Tabs>
     </div>

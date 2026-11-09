@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { RISK_SEVERITY_COLOR_CLASSES, RISK_SEVERITY_LABELS } from "@/lib/labels";
+import { getCriticalRulesForSector } from "@/lib/criteria";
 import { cn } from "@/lib/utils";
 import type { AgencySettings } from "@/types/settings";
 
@@ -13,6 +14,8 @@ interface CriticalRulesFormProps {
 }
 
 export function CriticalRulesForm({ settings, onChange }: CriticalRulesFormProps) {
+  const rules = getCriticalRulesForSector(settings.criticalRules, settings.sector);
+
   function toggleRule(id: string, isActive: boolean) {
     onChange({
       criticalRules: settings.criticalRules.map((rule) =>
@@ -27,7 +30,7 @@ export function CriticalRulesForm({ settings, onChange }: CriticalRulesFormProps
         <CardTitle className="text-base">Kritik Eleme Kuralları</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {settings.criticalRules.map((rule) => (
+        {rules.map((rule) => (
           <div key={rule.id} className="flex items-start justify-between gap-4 rounded-md border p-3">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">

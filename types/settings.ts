@@ -1,5 +1,7 @@
 import type { DecisionLevel, RiskSeverity } from "./evaluation";
 
+export type Sector = "automation" | "ads" | "real_estate";
+
 export type CriticalRuleKey =
   | "budget_below_minimum"
   | "no_decision_maker_access"
@@ -35,6 +37,7 @@ export interface DecisionThreshold {
 
 export interface AgencySettings {
   version: number;
+  sector: Sector;
   agencyName: string;
   userName: string;
   defaultCurrency: string;

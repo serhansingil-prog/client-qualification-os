@@ -6,16 +6,18 @@ import { QUALIFICATION_STATUS_COLOR_CLASSES, QUALIFICATION_STATUS_LABELS } from 
 import { CriterionCard } from "@/components/evaluation/criterion-card";
 import type { CriterionAnswer, CriterionCategory } from "@/types/evaluation";
 import type { CriterionDefinition } from "@/types/scoring";
-import { CRITERIA_DEFINITIONS, CRITERION_CATEGORY_LABELS } from "@/lib/criteria";
+import type { Sector } from "@/types/settings";
+import { getCriteriaDefinitions, CRITERION_CATEGORY_LABELS } from "@/lib/criteria";
 
 interface CriterionStepProps {
   category: CriterionCategory;
   answers: CriterionAnswer[];
   onAnswerChange: (criterionId: string, patch: Partial<CriterionAnswer>) => void;
+  sector: Sector;
 }
 
-export function CriterionStep({ category, answers, onAnswerChange }: CriterionStepProps) {
-  const criteria: CriterionDefinition[] = CRITERIA_DEFINITIONS.filter((c) => c.category === category);
+export function CriterionStep({ category, answers, onAnswerChange, sector }: CriterionStepProps) {
+  const criteria: CriterionDefinition[] = getCriteriaDefinitions(sector).filter((c) => c.category === category);
 
   return (
     <div>

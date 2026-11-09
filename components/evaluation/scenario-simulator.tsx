@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import { DecisionBadge } from "@/components/scoring/decision-badge";
 import { simulateEvaluationChanges } from "@/lib/scoring";
 import { updateEvaluation } from "@/lib/storage";
+import { getCriteriaDefinitions } from "@/lib/criteria";
 import type { ClientEvaluation } from "@/types/evaluation";
-import type { AgencySettings } from "@/types/settings";
+import type { AgencySettings, Sector } from "@/types/settings";
 import type { SimulationChange } from "@/types/scoring";
 
 const SIMULATION_OPTIONS: { criterionId: string; label: string }[] = [
@@ -28,9 +29,10 @@ const SIMULATION_OPTIONS: { criterionId: string; label: string }[] = [
 interface ScenarioSimulatorProps {
   evaluation: ClientEvaluation;
   settings: AgencySettings;
+  sector: Sector;
 }
 
-export function ScenarioSimulator({ evaluation, settings }: ScenarioSimulatorProps) {
+export function ScenarioSimulator({ evaluation, settings, sector }: ScenarioSimulatorProps) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -44,8 +46,8 @@ export function ScenarioSimulator({ evaluation, settings }: ScenarioSimulatorPro
   );
 
   const simulation = useMemo(
-    () => simulateEvaluationChanges(evaluation, changes, settings),
-    [evaluation, changes, settings]
+    () => simulateEvaluationChanges(evaluation, changes, settings, getCriteriaDefinitions(sector)),
+    [evaluation, changes, settings, sector]
   );
 
   function toggle(criterionId: string) {

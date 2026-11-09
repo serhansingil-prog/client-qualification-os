@@ -5,7 +5,7 @@ export const NAV_ITEMS = [
   { href: "/evaluations", label: "Değerlendirmeler", icon: ClipboardList },
   { href: "/evaluations/new", label: "Yeni Değerlendirme", icon: PlusCircle },
   { href: "/settings", label: "Ayarlar", icon: Settings },
-  { href: "/guide", label: "Kullanım Kılavuzu", icon: BookOpen },
+  { href: "/guide", label: "Kullanım Kılavuzları", icon: BookOpen },
 ] as const;
 
 /**

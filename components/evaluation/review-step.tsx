@@ -4,15 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { QUALIFICATION_STATUS_COLOR_CLASSES, QUALIFICATION_STATUS_LABELS } from "@/lib/labels";
-import { CRITERIA_DEFINITIONS, CRITERION_CATEGORY_LABELS } from "@/lib/criteria";
+import { getCriteriaDefinitions, CRITERION_CATEGORY_LABELS } from "@/lib/criteria";
 import { isClientInformationComplete, type EvaluationDraft } from "@/lib/evaluation";
 import type { CriterionCategory } from "@/types/evaluation";
+import type { Sector } from "@/types/settings";
 import { CheckCircle2, CircleAlert } from "lucide-react";
 
 interface ReviewStepProps {
   draft: EvaluationDraft;
   onJumpToCategory: (category: CriterionCategory) => void;
   onJumpToClientInfo: () => void;
+  sector: Sector;
 }
 
 const CATEGORY_ORDER: CriterionCategory[] = [
@@ -23,9 +25,10 @@ const CATEGORY_ORDER: CriterionCategory[] = [
   "strategic",
 ];
 
-export function ReviewStep({ draft, onJumpToCategory, onJumpToClientInfo }: ReviewStepProps) {
+export function ReviewStep({ draft, onJumpToCategory, onJumpToClientInfo, sector }: ReviewStepProps) {
   const clientInfoComplete = isClientInformationComplete(draft);
   const evaluatedCount = draft.answers.filter((a) => a.status !== "not_evaluated").length;
+  const criteriaDefinitions = getCriteriaDefinitions(sector);
 
   return (
     <div className="space-y-6">
@@ -55,12 +58,12 @@ export function ReviewStep({ draft, onJumpToCategory, onJumpToClientInfo }: Revi
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            Kriter Değerlendirme Durumu ({evaluatedCount}/{CRITERIA_DEFINITIONS.length})
+            Kriter Değerlendirme Durumu ({evaluatedCount}/{criteriaDefinitions.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {CATEGORY_ORDER.map((category) => {
-            const criteria = CRITERIA_DEFINITIONS.filter((c) => c.category === category);
+            const criteria = criteriaDefinitions.filter((c) => c.category === category);
             return (
               <div key={category}>
                 <div className="mb-2 flex items-center justify-between">

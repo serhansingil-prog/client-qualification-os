@@ -20,6 +20,8 @@ import {
 } from "@/lib/evaluation";
 import { calculateEvaluationResult } from "@/lib/scoring";
 import { getEvaluationById, saveEvaluation, updateEvaluation } from "@/lib/storage";
+import { getCriteriaDefinitions, getSectorAdjustedSettings } from "@/lib/criteria";
+import { useDemoSector } from "@/hooks/use-demo-sector";
 import type { ClientInformationFormValues } from "@/lib/validation";
 import type { CriterionAnswer, CriterionCategory } from "@/types/evaluation";
 import type { AgencySettings } from "@/types/settings";
@@ -51,16 +53,22 @@ export function EvaluationWizard({ initialDraft, settings }: EvaluationWizardPro
   const [draft, setDraft] = useState<EvaluationDraft>(initialDraft);
   const [stepIndex, setStepIndex] = useState(0);
   const clientInfoRef = useRef<ClientInformationStepHandle>(null);
+  const demoSector = useDemoSector();
+  const effectiveSector = initialDraft.isDemo ? demoSector : settings.sector;
+  const adjustedSettings = useMemo(
+    () => getSectorAdjustedSettings(settings, effectiveSector),
+    [settings, effectiveSector]
+  );
 
   const currentStep = STEPS[stepIndex];
 
   const scoringResult = useMemo(
-    () => calculateEvaluationResult(draft, settings),
-    [draft, settings]
+    () => calculateEvaluationResult(draft, adjustedSettings, getCriteriaDefinitions(effectiveSector)),
+    [draft, adjustedSettings, effectiveSector]
   );
 
   async function persist(finalize: boolean) {
-    const evaluation = draftToEvaluation({ ...draft, isDraft: !finalize }, settings);
+    const evaluation = draftToEvaluation({ ...draft, isDraft: !finalize }, adjustedSettings);
     const existing = await getEvaluationById(evaluation.id);
     if (existing) {
       await updateEvaluation(evaluation.id, evaluation);
@@ -180,6 +188,7 @@ export function EvaluationWizard({ initialDraft, settings }: EvaluationWizardPro
             category={currentStep.category}
             answers={draft.answers}
             onAnswerChange={handleAnswerChange}
+            sector={effectiveSector}
           />
         ) : null}
 
@@ -188,6 +197,7 @@ export function EvaluationWizard({ initialDraft, settings }: EvaluationWizardPro
             draft={draft}
             onJumpToCategory={goToCategory}
             onJumpToClientInfo={() => setStepIndex(0)}
+            sector={effectiveSector}
           />
         ) : null}
 
@@ -196,6 +206,7 @@ export function EvaluationWizard({ initialDraft, settings }: EvaluationWizardPro
             evaluation={draft}
             result={scoringResult}
             decisionThresholds={settings.decisionThresholds}
+            sector={effectiveSector}
           />
         ) : null}
       </div>

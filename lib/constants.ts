@@ -1,5 +1,5 @@
 import type { AgencySettings, CriticalRule, DecisionThreshold } from "@/types/settings";
-import { CRITERIA_DEFINITIONS } from "@/lib/criteria";
+import { AGENCY_SECTION_LABELS, CRITERIA_DEFINITIONS, SECTOR_TECH_STACK_DEFAULTS } from "@/lib/criteria";
 
 export const APP_VERSION = "1.0.0";
 export const SETTINGS_STORAGE_KEY = "cqos_settings";
@@ -7,21 +7,9 @@ export const EVALUATIONS_STORAGE_KEY = "cqos_evaluations";
 export const DEMO_EVALUATIONS_STORAGE_KEY = "cqos_demo_evaluations";
 export const DEMO_MODE_STORAGE_KEY = "cqos_demo_mode";
 export const SIDEBAR_OPEN_STORAGE_KEY = "cqos_sidebar_open";
+export const ANTHROPIC_API_KEY_STORAGE_KEY = "cqos_anthropic_api_key";
 
-export const DEFAULT_TECH_STACK = [
-  "n8n",
-  "Shopify",
-  "Meta Ads",
-  "Google Ads",
-  "Lovable",
-  "Claude API",
-  "OpenAI API",
-  "HubSpot",
-  "Airtable",
-  "Google Sheets",
-  "Supabase",
-  "WordPress",
-];
+export const DEFAULT_TECH_STACK = SECTOR_TECH_STACK_DEFAULTS.automation;
 
 export const CURRENCIES = ["USD", "EUR", "GBP", "TRY"] as const;
 
@@ -197,7 +185,8 @@ const defaultCriterionWeights: Record<string, number> = Object.fromEntries(
 
 export const DEFAULT_SETTINGS: AgencySettings = {
   version: 1,
-  agencyName: "Ajansınız",
+  sector: "automation",
+  agencyName: AGENCY_SECTION_LABELS.automation.nameDefault,
   userName: "",
   defaultCurrency: "USD",
   minProjectBudget: 10000,

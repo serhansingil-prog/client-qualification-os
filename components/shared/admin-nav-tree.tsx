@@ -3,22 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, History, ShieldCheck, UserCheck } from "lucide-react";
+import { ChevronRight, History, ShieldCheck, SlidersHorizontal, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/hooks/use-user";
+import { useProfile } from "@/hooks/use-profile";
+import { isAdmin } from "@/lib/auth/roles";
 
 const ADMIN_ITEMS = [
   { href: "/admin", label: "Kullanıcı Onayları", icon: UserCheck },
+  { href: "/admin/permissions", label: "Yetki Matrisi", icon: SlidersHorizontal },
   { href: "/admin/recent-actions", label: "Son İşlemler", icon: History },
   { href: "/admin/changelog", label: "Değişiklik Günlüğü", icon: ShieldCheck },
 ] as const;
 
 export function AdminNavTree({ onNavigate }: { onNavigate?: () => void }) {
-  const { user, isLoaded } = useUser();
+  const { user, isLoaded: userLoaded } = useUser();
+  const { role, isLoaded: roleLoaded } = useProfile();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(true);
 
-  if (!isLoaded || !user || user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+  if (!userLoaded || !roleLoaded || !user || !isAdmin(role, user.email)) {
     return null;
   }
 

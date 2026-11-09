@@ -8,18 +8,19 @@ import { StrengthsList } from "@/components/evaluation/strengths-list";
 import { RiskList } from "@/components/evaluation/risk-list";
 import { ImprovementConditions } from "@/components/evaluation/improvement-conditions";
 import { getRecommendedNextAction } from "@/lib/evaluation";
-import { CRITERIA_DEFINITIONS } from "@/lib/criteria";
+import { getCriteriaDefinitions } from "@/lib/criteria";
 import type { ClientEvaluation } from "@/types/evaluation";
 import type { ScoringResult } from "@/types/scoring";
-import type { AgencySettings } from "@/types/settings";
+import type { AgencySettings, Sector } from "@/types/settings";
 
 interface ResultSummaryProps {
   evaluation: Pick<ClientEvaluation, "clientName" | "projectName">;
   result: ScoringResult;
   decisionThresholds: AgencySettings["decisionThresholds"];
+  sector: Sector;
 }
 
-export function ResultSummary({ evaluation, result, decisionThresholds }: ResultSummaryProps) {
+export function ResultSummary({ evaluation, result, decisionThresholds, sector }: ResultSummaryProps) {
   const hasBlockingCriticalFailure = result.criticalFailures.some((f) => f.blocksApproval);
   const recommendedNextAction = getRecommendedNextAction(result.decision, hasBlockingCriticalFailure);
 
@@ -34,7 +35,7 @@ export function ResultSummary({ evaluation, result, decisionThresholds }: Result
             <DecisionBadge decision={result.decision} />
             <ConfidenceBadge level={result.confidenceLevel} />
             <span className="text-sm text-muted-foreground">
-              {result.evaluatedCriteriaCount}/{result.totalCriteriaCount ?? CRITERIA_DEFINITIONS.length} kriter
+              {result.evaluatedCriteriaCount}/{result.totalCriteriaCount ?? getCriteriaDefinitions(sector).length} kriter
               değerlendirildi
             </span>
           </div>
@@ -66,11 +67,12 @@ export function ResultSummary({ evaluation, result, decisionThresholds }: Result
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <StrengthsList strengths={result.strongestCriteria} />
+        <StrengthsList strengths={result.strongestCriteria} sector={sector} />
         <RiskList
           weakestCriteria={result.weakestCriteria}
           criticalFailures={result.criticalFailures}
           improvementConditions={result.improvementConditions}
+          sector={sector}
         />
       </div>
 

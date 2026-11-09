@@ -12,7 +12,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CURRENCIES } from "@/lib/constants";
-import type { AgencySettings } from "@/types/settings";
+import { AGENCY_SECTION_LABELS, SECTOR_LABELS, SECTOR_TECH_STACK_DEFAULTS } from "@/lib/criteria";
+import { useSectorPermission } from "@/hooks/use-sector-permission";
+import type { AgencySettings, Sector } from "@/types/settings";
+
+const ALL_SECTORS: Sector[] = ["automation", "ads", "real_estate"];
+
+function sameItems(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((item, index) => item === b[index]);
+}
 
 interface AgencySettingsFormProps {
   settings: AgencySettings;
@@ -20,14 +28,50 @@ interface AgencySettingsFormProps {
 }
 
 export function AgencySettingsForm({ settings, onChange }: AgencySettingsFormProps) {
+  const agencyLabels = AGENCY_SECTION_LABELS[settings.sector];
+  const { allowedSectors } = useSectorPermission();
+  const sectorOptions = allowedSectors ?? ALL_SECTORS;
+
+  function handleSectorChange(sector: Sector) {
+    const patch: Partial<AgencySettings> = { sector };
+    // Only swap the tech stack examples / agency name if they're still
+    // exactly the previous sector's untouched defaults — never overwrite
+    // something the user has actually customized.
+    if (sameItems(settings.standardTechStack, SECTOR_TECH_STACK_DEFAULTS[settings.sector])) {
+      patch.standardTechStack = SECTOR_TECH_STACK_DEFAULTS[sector];
+    }
+    if (settings.agencyName === AGENCY_SECTION_LABELS[settings.sector].nameDefault) {
+      patch.agencyName = AGENCY_SECTION_LABELS[sector].nameDefault;
+    }
+    onChange(patch);
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Ajans Bilgileri</CardTitle>
+        <CardTitle className="text-base">{agencyLabels.cardTitle}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor="sector">Sektör</Label>
+          <Select
+            value={settings.sector}
+            onValueChange={(value) => value && handleSectorChange(value as Sector)}
+          >
+            <SelectTrigger id="sector" className="w-full">
+              <SelectValue>{(value: Sector) => SECTOR_LABELS[value]}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {sectorOptions.map((sector) => (
+                <SelectItem key={sector} value={sector}>
+                  {SECTOR_LABELS[sector]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="space-y-2">
-          <Label htmlFor="agencyName">Ajans adı</Label>
+          <Label htmlFor="agencyName">{agencyLabels.nameLabel}</Label>
           <Input
             id="agencyName"
             value={settings.agencyName}

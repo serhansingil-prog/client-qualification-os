@@ -21,7 +21,7 @@ export function MaskableInput({ type, className, ...props }: MaskableInputProps)
         className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-muted-foreground hover:text-foreground"
         aria-label={visible ? "Gizle" : "Göster"}
       >
-        {visible ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+        {visible ? <Eye className="h-4 w-4" aria-hidden="true" /> : <EyeOff className="h-4 w-4" aria-hidden="true" />}
       </button>
     </div>
   );

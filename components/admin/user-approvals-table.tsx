@@ -2,12 +2,20 @@
 
 import { useState } from "react";
 import { Archive } from "lucide-react";
-import { approveUser, archiveUsers, rejectUser } from "@/app/(app)/admin/actions";
+import { approveUser, archiveUsers, rejectUser, setUserRole } from "@/app/(app)/admin/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { MaskedEmail } from "@/components/shared/masked-email";
+import { SectorPermissionPicker } from "@/components/admin/sector-permission-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -17,11 +25,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDateTime } from "@/lib/dates";
+import { cn } from "@/lib/utils";
+import type { UserRole } from "@/lib/auth/roles";
+import type { Sector } from "@/types/settings";
 
 interface Profile {
   id: string;
   email: string;
   status: string;
+  role: UserRole;
+  allowedSectors: Sector[];
+  defaultSector: Sector | null;
   created_at: string;
 }
 
@@ -35,6 +49,20 @@ const STATUS_VARIANTS: Record<string, "outline" | "default" | "destructive"> = {
   pending: "outline",
   approved: "default",
   rejected: "destructive",
+};
+
+const ROLE_OPTIONS: UserRole[] = ["user", "moderator", "admin"];
+
+const ROLE_LABELS: Record<UserRole, string> = {
+  user: "Kullanıcı",
+  moderator: "Moderatör",
+  admin: "Admin",
+};
+
+const ROLE_BADGE_CLASS: Record<UserRole, string> = {
+  user: "bg-muted text-muted-foreground",
+  moderator: "border-blue-500/30 bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  admin: "border-violet-500/30 bg-violet-500/15 text-violet-600 dark:text-violet-400",
 };
 
 interface UserApprovalsTableProps {
@@ -87,6 +115,8 @@ export function UserApprovalsTable({ profiles }: UserApprovalsTableProps) {
             <TableHead>E-posta</TableHead>
             <TableHead>Kayıt Tarihi</TableHead>
             <TableHead>Durum</TableHead>
+            <TableHead>Rol</TableHead>
+            <TableHead>Sektör</TableHead>
             <TableHead className="text-right">İşlem</TableHead>
           </TableRow>
         </TableHeader>
@@ -109,6 +139,30 @@ export function UserApprovalsTable({ profiles }: UserApprovalsTableProps) {
                 <Badge variant={STATUS_VARIANTS[profile.status]}>
                   {STATUS_LABELS[profile.status]}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                <Select
+                  value={profile.role}
+                  onValueChange={(value) => value && setUserRole(profile.id, value as UserRole)}
+                >
+                  <SelectTrigger className={cn("w-36", ROLE_BADGE_CLASS[profile.role])} size="sm">
+                    <SelectValue>{(value: UserRole) => ROLE_LABELS[value]}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLE_OPTIONS.map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {ROLE_LABELS[role]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell>
+                <SectorPermissionPicker
+                  userId={profile.id}
+                  allowedSectors={profile.allowedSectors.length > 0 ? profile.allowedSectors : null}
+                  defaultSector={profile.defaultSector}
+                />
               </TableCell>
               <TableCell className="flex justify-end gap-2">
                 {profile.status !== "approved" ? (

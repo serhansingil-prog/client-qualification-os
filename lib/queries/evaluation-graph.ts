@@ -1,5 +1,6 @@
-import { getCriterionById } from "@/lib/criteria";
+import { getCriterionByIdForSector } from "@/lib/criteria";
 import type { ClientEvaluation, DecisionLevel } from "@/types/evaluation";
+import type { Sector } from "@/types/settings";
 
 export type EvaluationGraphNodeKind = "evaluation" | "industry" | "leadSource" | "risk";
 
@@ -54,7 +55,10 @@ function addHubGroup(
   }
 }
 
-export function buildEvaluationGraph(evaluations: ClientEvaluation[]): EvaluationGraphData {
+export function buildEvaluationGraph(
+  evaluations: ClientEvaluation[],
+  sector: Sector = "automation"
+): EvaluationGraphData {
   const nodes: EvaluationGraphNode[] = evaluations.map((evaluation) => ({
     id: evaluation.id,
     title: evaluation.clientName || evaluation.companyName || "İsimsiz",
@@ -71,12 +75,12 @@ export function buildEvaluationGraph(evaluations: ClientEvaluation[]): Evaluatio
     "risk",
     nodes,
     links,
-    riskHubLabel
+    (criterionId) => riskHubLabel(criterionId, sector)
   );
 
   return { nodes, links };
 }
 
-function riskHubLabel(criterionId: string): string {
-  return getCriterionById(criterionId)?.name ?? criterionId;
+function riskHubLabel(criterionId: string, sector: Sector): string {
+  return getCriterionByIdForSector(criterionId, sector)?.name ?? criterionId;
 }

@@ -1,4 +1,5 @@
 import type { CriterionDefinition } from "@/types/scoring";
+import type { AgencySettings, CriticalRule, CriticalRuleKey, Sector } from "@/types/settings";
 
 export const CRITERIA_DEFINITIONS: CriterionDefinition[] = [
   {
@@ -372,10 +373,285 @@ export function getCriterionById(id: string): CriterionDefinition | undefined {
   return CRITERIA_DEFINITIONS.find((criterion) => criterion.id === id);
 }
 
+export const SECTOR_LABELS: Record<Sector, string> = {
+  automation: "Dijital Otomasyon Ajansı",
+  ads: "Dijital Reklam Ajansı",
+  real_estate: "Gayrimenkul Ofisi",
+};
+
 export const CRITERION_CATEGORY_LABELS: Record<string, string> = {
   commercial: "Ticari Uygunluk",
   operational: "Operasyonel Uygunluk",
   technical: "Teknik Hazırlık",
   relationship: "Çalışma İlişkisi",
   strategic: "Stratejik Uyum",
+};
+
+// Only the three "technical" criteria are worded specifically for a
+// software/automation agency (tech stack, solution templates, technical
+// data). Everything else (budget, timeline, decision maker, communication,
+// strategic fit) already reads as sector-neutral, so "automation" needs no
+// override — it stays the base CRITERIA_DEFINITIONS wording.
+type CriterionOverride = Pick<
+  CriterionDefinition,
+  "name" | "shortDescription" | "mainQuestion" | "goodSigns" | "redFlags"
+>;
+
+const SECTOR_CRITERIA_OVERRIDES: Partial<Record<Sector, Record<string, CriterionOverride>>> = {
+  ads: {
+    tech_stack_fit: {
+      name: "Reklam Platformu ve Hesap Uyumu",
+      shortDescription:
+        "Müşterinin standart reklam platformlarını (Meta, Google) kullanıp kullanmadığını veya geçişe açık olup olmadığını değerlendirir.",
+      mainQuestion: "Müşteri standart reklam platformlarını kullanıyor veya yönetim erişimi vermeye istekli mi?",
+      goodSigns: [
+        "Meta/Google Ads hesabı mevcut ve erişime açık",
+        "Piksel/etiket kurulumuna açık",
+        "Reklam hesabı yönetici erişimi verilebiliyor",
+      ],
+      redFlags: [
+        "Reklam hesabı yok veya kapalı",
+        "Hesap paylaşımına kapalı",
+        "Piksel/analitik kurulumuna izin vermiyor",
+        "Sadece organik içerik istiyor ama reklam bütçesi de bekliyor",
+      ],
+    },
+    template_reusability_fit: {
+      name: "Kampanya Şablonu Uyumu",
+      shortDescription: "Talebin mevcut bir kampanya şablonuyla ne oranda örtüştüğünü değerlendirir.",
+      mainQuestion: "Talep mevcut bir kampanya şablonuyla en az yüzde 80 oranında örtüşüyor mu?",
+      goodSigns: [
+        "Mevcut kampanya şablonuna doğrudan uyuyor",
+        "Küçük özelleştirme gerekiyor",
+        "Yeni fakat tekrar kullanılabilir bir kampanya yapısı oluşturulabilir",
+      ],
+      redFlags: ["Büyük özelleştirme gerekiyor", "Tamamen özel ve tek seferlik bir kampanya isteniyor"],
+    },
+    technical_data_readiness: {
+      name: "Reklam Verisi ve Erişim Hazırlığı",
+      shortDescription:
+        "Gerekli reklam hesabı erişimlerinin, piksel/verinin ve KVKK gereksinimlerinin hazır olup olmadığını değerlendirir.",
+      mainQuestion: "Gerekli hesap erişimleri, piksel/analitik verisi ve KVKK gereksinimleri hazır mı?",
+      goodSigns: [
+        "Reklam hesabı yönetici erişimi hazır",
+        "Piksel/analitik kurulu",
+        "Müşteri verisi düzenli",
+        "KVKK gereksinimleri belirlenmiş",
+        "Marka varlıkları (logo, görsel) hazır",
+      ],
+      redFlags: [
+        "Hesap erişimi proje başladıktan sonra verilecek",
+        "Piksel/analitik kurulu değil",
+        "Marka varlıkları eksik",
+        "KVKK/veri paylaşım onayı belirsiz",
+      ],
+    },
+  },
+  real_estate: {
+    tech_stack_fit: {
+      name: "Mülk Belgeleri ve Sistem Uyumu",
+      shortDescription:
+        "Mülkün tapu/belge durumunun ve mevcut ilan sistemlerinin standart sürece uyup uymadığını değerlendirir.",
+      mainQuestion: "Mülkün tapu ve belgeleri standart sürece uygun mu, ya da tamamlanmaya açık mı?",
+      goodSigns: [
+        "Tapu ve belgeler eksiksiz",
+        "İlan/portföy sistemine entegrasyona açık",
+        "Standart yetkilendirme belgesi imzalanabiliyor",
+      ],
+      redFlags: [
+        "Tapu/belge sorunları var",
+        "Birden fazla hissedar anlaşmazlığı",
+        "Yetkilendirme belgesi imzalamaya kapalı",
+        "Sadece kendi ilan kanallarını kullanmak istiyor",
+      ],
+    },
+    template_reusability_fit: {
+      name: "Hizmet Paketi Uyumu",
+      shortDescription: "Talebin mevcut bir standart hizmet paketiyle ne oranda örtüştüğünü değerlendirir.",
+      mainQuestion: "Talep mevcut bir standart hizmet paketiyle en az yüzde 80 oranında örtüşüyor mu?",
+      goodSigns: [
+        "Mevcut standart pakete doğrudan uyuyor",
+        "Küçük özelleştirme gerekiyor",
+        "Yeni fakat tekrar kullanılabilir bir paket oluşturulabilir",
+      ],
+      redFlags: ["Büyük özelleştirme gerekiyor", "Tamamen özel ve tek seferlik bir talep"],
+    },
+    technical_data_readiness: {
+      name: "Mülk Verisi ve Belge Hazırlığı",
+      shortDescription:
+        "Mülkle ilgili gerekli belgelerin, fotoğrafların ve yasal verilerin hazır olup olmadığını değerlendirir.",
+      mainQuestion: "Mülkle ilgili gerekli belgeler, fotoğraflar ve yasal veriler hazır mı?",
+      goodSigns: [
+        "Tapu ve yasal belgeler hazır",
+        "Güncel fotoğraf/plan mevcut",
+        "Mülk sahibi/yetkilisi belli",
+        "KVKK ve kişisel veri gereksinimleri belirlenmiş",
+      ],
+      redFlags: [
+        "Belgeler eksik veya güncel değil",
+        "Fotoğraf/plan yok",
+        "Mülk sahipliği belirsiz",
+        "Birden fazla yetkisiz kişi süreçte",
+      ],
+    },
+  },
+};
+
+/** Same 14 criteria, same ids/weights/order/category (scoring never
+ * changes) — only name/description/question/signs are swapped for the
+ * sector's vocabulary where an override exists. */
+export function getCriteriaDefinitions(sector: Sector = "automation"): CriterionDefinition[] {
+  const overrides = SECTOR_CRITERIA_OVERRIDES[sector];
+  if (!overrides) return CRITERIA_DEFINITIONS;
+  return CRITERIA_DEFINITIONS.map((criterion) => {
+    const override = overrides[criterion.id];
+    return override ? { ...criterion, ...override } : criterion;
+  });
+}
+
+export function getCriterionByIdForSector(id: string, sector: Sector = "automation"): CriterionDefinition | undefined {
+  return getCriteriaDefinitions(sector).find((criterion) => criterion.id === id);
+}
+
+type CriticalRuleOverride = Pick<CriticalRule, "title" | "description">;
+
+// Same 3 sector-flavored spots as the criteria above (support/maintenance
+// framing, admin/API access, unsupported custom systems) — only wording
+// changes; trigger conditions, severity and autoReject stay identical.
+const SECTOR_CRITICAL_RULE_OVERRIDES: Partial<
+  Record<Sector, Partial<Record<CriticalRuleKey, CriticalRuleOverride>>>
+> = {
+  ads: {
+    expects_free_lifetime_support: {
+      title: "Ücretsiz sınırsız yönetim beklentisi",
+      description:
+        "Müşteri, kampanya kurulumu ile aylık reklam yönetiminin ayrı hizmetler olduğunu kabul etmiyor.",
+    },
+    no_admin_or_api_access: {
+      title: "Reklam hesabı erişimi sağlanamıyor",
+      description: "Reklam hesabı yönetici erişimi veya piksel/analitik erişimi sağlanamıyor.",
+    },
+    unsupported_custom_system: {
+      title: "Desteklenmeyen reklam platformu",
+      description: "Standart reklam platformları (Meta, Google) dışında desteklenmeyen bir sistem kullanılıyor.",
+    },
+  },
+  real_estate: {
+    expects_free_lifetime_support: {
+      title: "Ücretsiz sınırsız hizmet beklentisi",
+      description: "Müşteri, pazarlama ile satış/kiralama sürecinin farklı hizmet kalemleri olduğunu kabul etmiyor.",
+    },
+    no_admin_or_api_access: {
+      title: "Mülk belge erişimi sağlanamıyor",
+      description: "Tapu, yetkilendirme belgesi veya mülke ait gerekli belgeler sağlanamıyor.",
+    },
+    unsupported_custom_system: {
+      title: "Desteklenmeyen ilan/portföy sistemi",
+      description: "Standart ilan veya portföy yönetim süreciyle uyumlu olmayan özel bir sistem kullanılıyor.",
+    },
+  },
+};
+
+export function getCriticalRulesForSector(rules: CriticalRule[], sector: Sector = "automation"): CriticalRule[] {
+  const overrides = SECTOR_CRITICAL_RULE_OVERRIDES[sector];
+  if (!overrides) return rules;
+  return rules.map((rule) => {
+    const override = overrides[rule.key];
+    return override ? { ...rule, ...override } : rule;
+  });
+}
+
+/** Same AgencySettings, only criticalRules text swapped for the sector's
+ * vocabulary — safe to pass anywhere a plain AgencySettings is expected. */
+export function getSectorAdjustedSettings(settings: AgencySettings, sector: Sector): AgencySettings {
+  return { ...settings, criticalRules: getCriticalRulesForSector(settings.criticalRules, sector) };
+}
+
+export const AGENCY_SECTION_LABELS: Record<
+  Sector,
+  { cardTitle: string; nameLabel: string; nameDefault: string }
+> = {
+  automation: { cardTitle: "Ajans Bilgileri", nameLabel: "Ajans adı", nameDefault: "Ajansınız" },
+  ads: { cardTitle: "Ajans Bilgileri", nameLabel: "Ajans adı", nameDefault: "Ajansınız" },
+  real_estate: { cardTitle: "Ofis Bilgileri", nameLabel: "Ofis adı", nameDefault: "Ofisiniz" },
+};
+
+export const SECTOR_TECH_STACK_DEFAULTS: Record<Sector, string[]> = {
+  automation: [
+    "n8n",
+    "Shopify",
+    "Meta Ads",
+    "Google Ads",
+    "Lovable",
+    "Claude API",
+    "OpenAI API",
+    "HubSpot",
+    "Airtable",
+    "Google Sheets",
+    "Supabase",
+    "WordPress",
+  ],
+  ads: [
+    "Meta Ads",
+    "Google Ads",
+    "TikTok Ads",
+    "LinkedIn Ads",
+    "Google Analytics",
+    "Meta Pixel",
+    "Google Tag Manager",
+    "Google Merchant Center",
+    "Canva",
+    "HubSpot",
+  ],
+  real_estate: [
+    "Sahibinden.com",
+    "Hepsiemlak",
+    "Zingat",
+    "Emlakjet",
+    "WhatsApp Business",
+    "Instagram",
+    "Google Haritalar",
+    "Canva",
+    "Google Sheets",
+  ],
+};
+
+export const TECH_STACK_SECTION_LABELS: Record<
+  Sector,
+  {
+    tab: string;
+    cardTitle: string;
+    helperText: string;
+    placeholder: string;
+    emptyText: string;
+    removeLabel: (item: string) => string;
+  }
+> = {
+  automation: {
+    tab: "Teknoloji Yığını",
+    cardTitle: "Standart Teknoloji Yığını",
+    helperText:
+      "Değerlendirme sırasında \"Teknoloji Yığını Uyumu\" kriterini cevaplarken referans olması için tuttuğunuz liste; puanlamayı otomatik değiştirmez.",
+    placeholder: "Yeni teknoloji ekle",
+    emptyText: "Henüz teknoloji eklenmedi.",
+    removeLabel: (item) => `${item} teknolojisini kaldır`,
+  },
+  ads: {
+    tab: "Reklam Platformları",
+    cardTitle: "Standart Reklam Platformları ve Araçlar",
+    helperText:
+      "Değerlendirme sırasında \"Reklam Platformu ve Hesap Uyumu\" kriterini cevaplarken referans olması için tuttuğunuz liste; puanlamayı otomatik değiştirmez.",
+    placeholder: "Yeni platform veya araç ekle",
+    emptyText: "Henüz platform eklenmedi.",
+    removeLabel: (item) => `${item} platformunu kaldır`,
+  },
+  real_estate: {
+    tab: "Sistemler ve Araçlar",
+    cardTitle: "Standart Sistemler ve Araçlar",
+    helperText:
+      "Değerlendirme sırasında \"Mülk Belgeleri ve Sistem Uyumu\" kriterini cevaplarken referans olması için tuttuğunuz liste; puanlamayı otomatik değiştirmez.",
+    placeholder: "Yeni sistem veya araç ekle",
+    emptyText: "Henüz sistem eklenmedi.",
+    removeLabel: (item) => `${item} sistemini kaldır`,
+  },
 };

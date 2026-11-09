@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
-import { activateDemoDataset } from "@/lib/sample-data";
+import { DemoLoadButton } from "@/components/dashboard/demo-load-button";
+import { activateDemoDataset, DEMO_SECTORS, type DemoSector } from "@/lib/sample-data";
 import type { AgencySettings } from "@/types/settings";
 
 interface EmptyDashboardProps {
@@ -16,9 +17,10 @@ interface EmptyDashboardProps {
 export function EmptyDashboard({ settings }: EmptyDashboardProps) {
   const router = useRouter();
 
-  function loadSample() {
-    activateDemoDataset(settings);
-    toast.success("15 örnek demo değerlendirmesi yüklendi.");
+  function loadSample(sector: DemoSector) {
+    activateDemoDataset(settings, sector);
+    const label = DEMO_SECTORS.find((option) => option.key === sector)?.label;
+    toast.success(`${label} için 15 örnek demo değerlendirmesi yüklendi.`);
     router.push("/evaluations");
   }
 
@@ -34,9 +36,7 @@ export function EmptyDashboard({ settings }: EmptyDashboardProps) {
             className="bg-accent-2 text-accent-2-foreground hover:bg-accent-2/90"
             render={<Link href="/evaluations/new">Yeni değerlendirme oluştur</Link>}
           />
-          <Button variant="outline" onClick={loadSample}>
-            Örnek değerlendirmeyi yükle
-          </Button>
+          <DemoLoadButton label="Örnek değerlendirmeyi yükle" ownSector={settings.sector} onSelect={loadSample} />
         </>
       }
     />

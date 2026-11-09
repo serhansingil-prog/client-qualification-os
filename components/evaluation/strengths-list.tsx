@@ -1,12 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCriterionById } from "@/lib/criteria";
+import { getCriterionByIdForSector } from "@/lib/criteria";
 import type { CriterionResultSummary } from "@/types/scoring";
+import type { Sector } from "@/types/settings";
 
 interface StrengthsListProps {
   strengths: CriterionResultSummary[];
+  sector: Sector;
 }
 
-export function StrengthsList({ strengths }: StrengthsListProps) {
+export function StrengthsList({ strengths, sector }: StrengthsListProps) {
   if (strengths.length === 0) {
     return (
       <Card>
@@ -27,11 +29,11 @@ export function StrengthsList({ strengths }: StrengthsListProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {strengths.map((strength) => {
-          const criterion = getCriterionById(strength.criterionId);
+          const criterion = getCriterionByIdForSector(strength.criterionId, sector);
           return (
             <div key={strength.criterionId} className="rounded-md border p-3">
               <div className="flex items-center justify-between gap-2">
-                <span className="font-medium">{strength.name}</span>
+                <span className="font-medium">{criterion?.name ?? strength.name}</span>
                 <span className="text-sm text-muted-foreground">Puan: {strength.score}</span>
               </div>
               {criterion ? (

@@ -18,10 +18,11 @@ import { EvaluationTable } from "@/components/history/evaluation-table";
 import { EvaluationActions } from "@/components/history/evaluation-actions";
 import { DemoModeBanner } from "@/components/shared/demo-mode-banner";
 import { ClientPagination } from "@/components/shared/client-pagination";
+import { DemoLoadButton } from "@/components/dashboard/demo-load-button";
 import { useEvaluations } from "@/hooks/use-evaluations";
 import { useDemoMode } from "@/hooks/use-demo-mode";
 import { useSettings } from "@/hooks/use-settings";
-import { activateDemoDataset } from "@/lib/sample-data";
+import { activateDemoDataset, DEMO_SECTORS, type DemoSector } from "@/lib/sample-data";
 
 const PAGE_SIZE = 5;
 
@@ -156,15 +157,17 @@ export default function EvaluationsPage() {
             title="Demo verisi henüz yüklenmedi"
             description="Karar seviyesi, sektör ve kaynak kümelerini gösteren 15 demo değerlendirmesi yükleyin."
             actions={
-              <Button
-                onClick={() => {
-                  activateDemoDataset(settings);
+              <DemoLoadButton
+                label="Örnek değerlendirmeleri yükle"
+                variant="default"
+                ownSector={settings.sector}
+                onSelect={(sector: DemoSector) => {
+                  activateDemoDataset(settings, sector);
                   refresh();
-                  toast.success("15 örnek demo değerlendirmesi yüklendi.");
+                  const label = DEMO_SECTORS.find((option) => option.key === sector)?.label;
+                  toast.success(`${label} için 15 örnek demo değerlendirmesi yüklendi.`);
                 }}
-              >
-                Örnek değerlendirmeleri yükle
-              </Button>
+              />
             }
           />
         ) : (

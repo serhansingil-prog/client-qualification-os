@@ -1,9 +1,9 @@
-import { redirect } from "next/navigation";
 import { UserApprovalsTable } from "@/components/admin/user-approvals-table";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdminPage } from "@/lib/auth/require-admin";
+import type { Sector } from "@/types/settings";
 
 const PAGE_SIZE = 10;
 
@@ -12,14 +12,7 @@ export default async function AdminPage({
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-    redirect("/");
-  }
+  await requireAdminPage();
 
   const { page: pageParam } = await searchParams;
   const currentPage = Math.max(1, Number(pageParam) || 1);
@@ -29,12 +22,35 @@ export default async function AdminPage({
   const admin = createAdminClient();
   const { data: profiles, count } = await admin
     .from("profiles")
-    .select("id, email, status, created_at", { count: "exact" })
+    .select("id, email, status, role, created_at", { count: "exact" })
     .eq("archived", false)
     .order("created_at", { ascending: false })
     .range(from, to);
 
   const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
+
+  const profileIds = (profiles ?? []).map((p) => p.id);
+  const { data: permissionRows } = await admin
+    .from("user_sector_permissions")
+    .select("user_id, sector, is_default")
+    .in("user_id", profileIds.length > 0 ? profileIds : [""]);
+
+  const permissionsByUser = new Map<string, { allowedSectors: Sector[]; defaultSector: Sector | null }>();
+  for (const row of permissionRows ?? []) {
+    const entry = permissionsByUser.get(row.user_id) ?? { allowedSectors: [], defaultSector: null };
+    entry.allowedSectors.push(row.sector as Sector);
+    if (row.is_default) entry.defaultSector = row.sector as Sector;
+    permissionsByUser.set(row.user_id, entry);
+  }
+
+  const profilesWithPermissions = (profiles ?? []).map((p) => {
+    const entry = permissionsByUser.get(p.id);
+    return {
+      ...p,
+      allowedSectors: entry?.allowedSectors ?? [],
+      defaultSector: entry?.defaultSector ?? null,
+    };
+  });
 
   return (
     <Card>
@@ -45,7 +61,7 @@ export default async function AdminPage({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <UserApprovalsTable profiles={profiles ?? []} />
+        <UserApprovalsTable profiles={profilesWithPermissions} />
       </CardContent>
       <CardFooter>
         <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/admin" />

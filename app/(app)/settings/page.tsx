@@ -9,11 +9,13 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgencySettingsForm } from "@/components/settings/agency-settings-form";
+import { ApiKeyCard } from "@/components/settings/api-key-card";
 import { ScoringSettingsForm } from "@/components/settings/scoring-settings-form";
 import { TechnologyStackForm } from "@/components/settings/technology-stack-form";
 import { CriticalRulesForm } from "@/components/settings/critical-rules-form";
 import { useSettings } from "@/hooks/use-settings";
 import { DEFAULT_SETTINGS } from "@/lib/constants";
+import { TECH_STACK_SECTION_LABELS } from "@/lib/criteria";
 import type { AgencySettings } from "@/types/settings";
 
 export default function SettingsPage() {
@@ -82,12 +84,13 @@ export default function SettingsPage() {
         <TabsList>
           <TabsTrigger value="agency">Genel</TabsTrigger>
           <TabsTrigger value="scoring">Puanlama</TabsTrigger>
-          <TabsTrigger value="tech">Teknoloji Yığını</TabsTrigger>
+          <TabsTrigger value="tech">{TECH_STACK_SECTION_LABELS[formSettings.sector].tab}</TabsTrigger>
           <TabsTrigger value="critical">Kritik Kurallar</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="agency" className="mt-6">
+        <TabsContent value="agency" className="mt-6 space-y-6">
           <AgencySettingsForm settings={formSettings} onChange={patch} />
+          <ApiKeyCard />
         </TabsContent>
         <TabsContent value="scoring" className="mt-6">
           <ScoringSettingsForm settings={formSettings} onChange={patch} />

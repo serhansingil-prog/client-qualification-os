@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildDemoEvaluations } from "@/lib/sample-data";
+import { buildDemoEvaluations, DEMO_SECTORS } from "@/lib/sample-data";
 import { DEFAULT_SETTINGS } from "@/lib/constants";
 import type { DecisionLevel } from "@/types/evaluation";
 
-describe("buildDemoEvaluations", () => {
-  const demoEvaluations = buildDemoEvaluations(DEFAULT_SETTINGS);
+describe.each(DEMO_SECTORS)("buildDemoEvaluations ($label)", ({ key, clusterIndustry }) => {
+  const demoEvaluations = buildDemoEvaluations(DEFAULT_SETTINGS, key);
 
   it("creates exactly fifteen demo records", () => {
     expect(demoEvaluations).toHaveLength(15);
@@ -33,8 +33,8 @@ describe("buildDemoEvaluations", () => {
   // The extra ten records exist to give the connection graph real clusters
   // instead of fifteen disconnected pairs — assert those clusters actually
   // land where the graph will look for them.
-  it("clusters four records under the E-ticaret sector", () => {
-    const count = demoEvaluations.filter((e) => e.industry === "E-ticaret").length;
+  it("clusters four records under the sector's marquee industry", () => {
+    const count = demoEvaluations.filter((e) => e.industry === clusterIndustry).length;
     expect(count).toBe(4);
   });
 

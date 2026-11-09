@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { RISK_SEVERITY_COLOR_CLASSES, RISK_SEVERITY_LABELS } from "@/lib/labels";
-import { getCriterionById } from "@/lib/criteria";
+import { getCriterionByIdForSector } from "@/lib/criteria";
 import type { CriticalFailure, RiskSeverity } from "@/types/evaluation";
 import type { CriterionResultSummary, ImprovementCondition } from "@/types/scoring";
+import type { Sector } from "@/types/settings";
 
 interface RiskItem {
   id: string;
@@ -18,6 +19,7 @@ interface RiskListProps {
   weakestCriteria: CriterionResultSummary[];
   criticalFailures: CriticalFailure[];
   improvementConditions: ImprovementCondition[];
+  sector: Sector;
 }
 
 const SEVERITY_ORDER: RiskSeverity[] = ["critical", "high", "medium", "low"];
@@ -28,11 +30,11 @@ function resolutionFor(criterionId: string | undefined, improvementConditions: I
   return "Teklif göndermeden önce müşteriyle bu konuyu netleştirin.";
 }
 
-export function RiskList({ weakestCriteria, criticalFailures, improvementConditions }: RiskListProps) {
+export function RiskList({ weakestCriteria, criticalFailures, improvementConditions, sector }: RiskListProps) {
   const criticalItems: RiskItem[] = criticalFailures.map((failure) => ({
     id: failure.id,
     severity: failure.severity,
-    criterionName: getCriterionById(failure.criterionId ?? "")?.name ?? "Genel",
+    criterionName: getCriterionByIdForSector(failure.criterionId ?? "", sector)?.name ?? "Genel",
     description: failure.description,
     impact: failure.blocksApproval
       ? "Bu risk çözülmeden proje onaylanmamalı."
@@ -44,11 +46,11 @@ export function RiskList({ weakestCriteria, criticalFailures, improvementConditi
   const weakItems: RiskItem[] = weakestCriteria
     .filter((c) => (c.score ?? 1) < 1 && !criticalCriterionIds.has(c.criterionId))
     .map((c) => {
-      const criterion = getCriterionById(c.criterionId);
+      const criterion = getCriterionByIdForSector(c.criterionId, sector);
       return {
         id: `weak_${c.criterionId}`,
         severity: (c.score ?? 0) === 0 ? "high" : ("medium" as RiskSeverity),
-        criterionName: c.name,
+        criterionName: criterion?.name ?? c.name,
         description: criterion?.redFlags[0] ?? "Bu kriterde belirsizlik var.",
         impact: "Netleşmeden ilerlenirse kapsam veya beklenti uyuşmazlığı yaşanabilir.",
         resolution: resolutionFor(c.criterionId, improvementConditions),

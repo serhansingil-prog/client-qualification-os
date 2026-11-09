@@ -1,10 +1,9 @@
-import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import { CHANGELOG_ENTRIES } from "@/lib/changelog";
 import { formatDateTime } from "@/lib/dates";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdminPage } from "@/lib/auth/require-admin";
 
 const PAGE_SIZE = 5;
 
@@ -13,14 +12,7 @@ export default async function ChangelogPage({
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user || user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-    redirect("/");
-  }
+  await requireAdminPage();
 
   const { page: pageParam } = await searchParams;
   const currentPage = Math.max(1, Number(pageParam) || 1);

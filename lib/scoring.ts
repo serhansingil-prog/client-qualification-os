@@ -150,7 +150,8 @@ const AUTO_RULE_CHECKS: AutoRuleCheck[] = [
 
 export function detectCriticalFailures(
   evaluation: EvaluationInput,
-  settings: AgencySettings
+  settings: AgencySettings,
+  criteriaDefs: CriterionDefinition[] = CRITERIA_DEFINITIONS
 ): CriticalFailure[] {
   const failures: CriticalFailure[] = [];
   const activeRules = new Map(
@@ -174,7 +175,7 @@ export function detectCriticalFailures(
 
   for (const answer of evaluation.answers) {
     if (!answer.isCriticalRisk) continue;
-    const criterion = getCriterionById(answer.criterionId);
+    const criterion = criteriaDefs.find((c) => c.id === answer.criterionId);
     failures.push({
       id: `cf_manual_${answer.criterionId}`,
       criterionId: answer.criterionId,
@@ -329,9 +330,10 @@ const IMPROVEMENT_SUGGESTIONS: {
 
 export function generateImprovementConditions(
   evaluation: EvaluationInput,
-  settings: AgencySettings
+  settings: AgencySettings,
+  criteriaDefs: CriterionDefinition[] = CRITERIA_DEFINITIONS
 ): ImprovementCondition[] {
-  const currentCriticalFailures = detectCriticalFailures(evaluation, settings);
+  const currentCriticalFailures = detectCriticalFailures(evaluation, settings, criteriaDefs);
   const conditions: ImprovementCondition[] = [];
 
   for (const suggestion of IMPROVEMENT_SUGGESTIONS) {
@@ -350,7 +352,7 @@ export function generateImprovementConditions(
           : evaluation.estimatedBudget,
     };
 
-    const newCriticalFailures = detectCriticalFailures(simulatedEvaluation, settings);
+    const newCriticalFailures = detectCriticalFailures(simulatedEvaluation, settings, criteriaDefs);
     const resolvedIds = currentCriticalFailures
       .filter((failure) => !newCriticalFailures.some((next) => next.id === failure.id))
       .map((failure) => failure.id);
@@ -376,7 +378,7 @@ export function calculateEvaluationResult(
   const standardScore = calculateStandardScore(evaluation.answers);
   const weightedScore = calculateWeightedScore(evaluation.answers);
   const confidenceLevel = calculateConfidenceLevel(evaluation.answers, criteriaDefs.length);
-  const criticalFailures = detectCriticalFailures(evaluation, settings);
+  const criticalFailures = detectCriticalFailures(evaluation, settings, criteriaDefs);
   const decision = deriveDecision(weightedScore, criticalFailures, settings);
 
   return {
@@ -389,18 +391,19 @@ export function calculateEvaluationResult(
     criticalFailures,
     strongestCriteria: getStrongestCriteria(evaluation.answers, criteriaDefs),
     weakestCriteria: getWeakestCriteria(evaluation.answers, criteriaDefs),
-    improvementConditions: generateImprovementConditions(evaluation, settings),
+    improvementConditions: generateImprovementConditions(evaluation, settings, criteriaDefs),
   };
 }
 
 export function simulateEvaluationChanges(
   evaluation: EvaluationInput,
   changes: SimulationChange[],
-  settings: AgencySettings
+  settings: AgencySettings,
+  criteriaDefs: CriterionDefinition[] = CRITERIA_DEFINITIONS
 ): SimulationResult {
   const currentStandardScore = calculateStandardScore(evaluation.answers);
   const currentWeightedScore = calculateWeightedScore(evaluation.answers);
-  const currentCriticalFailures = detectCriticalFailures(evaluation, settings);
+  const currentCriticalFailures = detectCriticalFailures(evaluation, settings, criteriaDefs);
   const currentDecision = deriveDecision(currentWeightedScore, currentCriticalFailures, settings);
 
   let simulatedAnswers = evaluation.answers;
@@ -432,7 +435,7 @@ export function simulateEvaluationChanges(
 
   const simulatedStandardScore = calculateStandardScore(simulatedEvaluation.answers);
   const simulatedWeightedScore = calculateWeightedScore(simulatedEvaluation.answers);
-  const simulatedCriticalFailures = detectCriticalFailures(simulatedEvaluation, settings);
+  const simulatedCriticalFailures = detectCriticalFailures(simulatedEvaluation, settings, criteriaDefs);
   const simulatedDecision = deriveDecision(simulatedWeightedScore, simulatedCriticalFailures, settings);
 
   const resolvedCriticalFailures = currentCriticalFailures.filter(
