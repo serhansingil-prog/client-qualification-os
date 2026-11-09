@@ -8,6 +8,22 @@ uygulama içindeki [Kullanım Kılavuzu](/guide) sayfasına bakın.
 
 **Canlı:** https://client-qualification-os.vercel.app
 
+## Pilot bağlamı
+
+Bu proje, küçük ve orta ölçekli işletmeler (KOBİ) için geliştirdiğim bir pilot sistemin
+(Serhan Business OS, Temmuz 2026) parçasıdır. Hedef, küçük bir işletmenin "bu müşteriyi
+alalım mı?" kararını sezgiyle değil, yazılı ve tekrarlanabilir ölçütlerle vermesi.
+Henüz canlı müşteri yok; uygulama demo modu ve örnek verilerle denenebilir. Örnek
+verilerdeki kişi ve firmalar uydurmadır.
+
+## Öne çıkanlar
+
+- 14 sabit kriter, 5 karar seviyesi; puanlama mantığı birim testlerle korunur
+- Supabase Auth + Postgres, satır düzeyinde güvenlik (RLS): her kullanıcı yalnız kendi
+  değerlendirmelerini görür; yeni kayıtlar admin onayından geçer
+- Demo Modu: gerçek veriden tamamen ayrı, tarayıcıda (localStorage) çalışan sandbox
+- Vercel'e sürekli dağıtım (`master` push'u production'a gider)
+
 ## Teknolojiler
 
 Next.js (App Router, Turbopack) · TypeScript · Tailwind CSS · shadcn/ui (Base UI) ·
