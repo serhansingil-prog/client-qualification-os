@@ -19,6 +19,6 @@ jobs:
           code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 \
             -H "apikey: $SUPABASE_ANON_KEY" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            "$SUPABASE_URL/rest/v1/")
+            "$SUPABASE_URL/rest/v1/evaluations?select=id&limit=1")
           echo "HTTP $code"
           test "$code" -ge 200 && test "$code" -lt 300
