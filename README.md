@@ -16,6 +16,13 @@ alalım mı?" kararını sezgiyle değil, yazılı ve tekrarlanabilir ölçütle
 Henüz canlı müşteri yok; uygulama demo modu ve örnek verilerle denenebilir. Örnek
 verilerdeki kişi ve firmalar uydurmadır.
 
+## Nasıl geliştirildi
+
+Bu proje [Claude Code](https://claude.com/claude-code) ile birlikte geliştirildi; kodun
+büyük kısmını Claude yazdı. Ürün kararlarını (ne ölçüleceği, puanlama kuralları, hangi
+özelliklerin gerektiği), test, dağıtım ve hata ayıklama sürecini ben yürüttüm. Commit
+geçmişindeki `Co-Authored-By` satırları bunu açıkça gösterir.
+
 ## Öne çıkanlar
 
 - 14 sabit kriter, 5 karar seviyesi; puanlama mantığı birim testlerle korunur
