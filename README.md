@@ -1,5 +1,33 @@
 # Client Qualification OS
 
+## English summary
+
+**Client Qualification OS** helps agencies and consultants decide which prospects are
+worth taking on. It scores each prospect against 14 fixed criteria and recommends one of
+five decisions: Hell Yes, Qualified Yes, More Info Needed, Soft No, or Hard No.
+
+**Live demo:** https://client-qualification-os.vercel.app (sign-up requires email
+confirmation and admin approval; Demo Mode shows sample data without touching real data).
+
+**Stack:** Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, Supabase (Auth +
+Postgres with row-level security), Zod, Recharts, Vitest, deployed on Vercel.
+
+**Highlights**
+- Every user only sees their own evaluations (RLS on all tables); new accounts are
+  approved by an admin before they can use the app.
+- Role-based permissions (admin / moderator / user) with a permission matrix.
+- Sector-based demo data (automation, ads, real estate).
+- Optional AI insights and voice summaries using the user's own Anthropic API key, kept
+  only in the browser.
+
+**How it was built:** with Claude Code. Claude wrote most of the code; I made the product
+decisions, tested, deployed and debugged it. This is a pilot for small businesses and has
+no live customers yet.
+
+---
+
+## Türkçe
+
 Ajanslar ve danışmanlar için potansiyel müşterileri 14 sabit kriter üzerinden puanlayıp
 beş karar seviyesinden birini (Kesinlikle Evet / Nitelikli Evet / Ek Bilgi Gerekli /
 Nazik Ret / Kesin Ret) öneren bir müşteri niteleme aracı. Amaç, hangi projelerin kabul
