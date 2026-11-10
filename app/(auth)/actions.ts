@@ -29,7 +29,11 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+    const closed = /signups? (are )?(not allowed|disabled)|not allowed for this/i.test(error.message);
+    const message = closed
+      ? "Yeni kayıtlar şu an kapalı. Demo Modu'nu kullanabilir ya da yöneticiyle iletişime geçebilirsiniz."
+      : error.message;
+    redirect(`/signup?error=${encodeURIComponent(message)}`);
   }
 
   revalidatePath("/", "layout");

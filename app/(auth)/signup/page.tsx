@@ -19,6 +19,10 @@ export default async function SignupPage({
         <CardDescription>Client Qualification OS için yeni bir hesap oluşturun.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <p className="rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+          Bu uygulama bir pilot demodur. Kayıtlar yönetici onayına bağlıdır ve gerçek müşteri ya da kişisel
+          veri girmemelisiniz. Denemek için kayıt olmadan Demo Modu&apos;nu kullanabilirsiniz.
+        </p>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
         <form action={signup} className="space-y-4">
           <div className="space-y-2">
